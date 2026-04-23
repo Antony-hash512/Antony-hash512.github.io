@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: white;
+            font-family: 'Roboto', Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .controls {
+            background: #1f1f1f;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        input {
+            background: #0f0f0f;
+            border: 1px solid #555;
+            color: white;
+            padding: 8px;
+            margin-right: 10px;
+            width: 300px;
+        }
+
+        label {
+            margin-right: 5px;
+            color: #aaa;
+        }
+
+        /* Mockup Container */
+        .mockup-area {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        /* --- SIDEBAR STYLE (Suggested Video) --- */
+        .sidebar-item {
+            display: flex;
+            gap: 8px;
+            width: 400px;
+            cursor: pointer;
+        }
+
+        .sidebar-thumb {
+            position: relative;
+            width: 168px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-thumb img {
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+            object-fit: cover;
+            aspect-ratio: 16/9;
+        }
+
+        .time-badge {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 12px;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .sidebar-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 40px;
+            padding-right: 24px;
+        }
+
+        .sidebar-channel,
+        .sidebar-stats {
+            font-size: 12px;
+            color: #aaa;
+            line-height: 18px;
+        }
+
+        /* --- HOME STYLE (Large) --- */
+        .home-item {
+            width: 360px;
+            cursor: pointer;
+        }
+
+        .home-thumb {
+            position: relative;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .home-thumb img {
+            width: 100%;
+            border-radius: 12px;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+
+        .home-meta {
+            display: flex;
+            gap: 12px;
+        }
+
+        .home-avatar {
+            width: 36px;
+            height: 36px;
+            background: #555;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .home-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .home-title {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 22px;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .home-stats {
+            font-size: 14px;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="controls">
+        <h3>YouTube Preview Tool (Local)</h3>
+
+        <!-- Global Controls -->
+        <div style="margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+            <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <label>Channel Name (Shared):</label>
+                    <input type="text" id="channelInput" value="Hacker's LifeStyle" oninput="updateAll()"
+                        style="width: 200px;">
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <input type="checkbox" id="showHour" checked onchange="updateAll()"
+                        style="width: auto; margin-right: 8px;">
+                    <label for="showHour" style="cursor: pointer; color: white;">Show Hours</label>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <input type="checkbox" id="homeLayout" checked onchange="updateLayout()"
+                        style="width: auto; margin-right: 8px;">
+                    <label for="homeLayout" style="cursor: pointer; color: white;">Row Layout (Home)</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slots Container -->
+        <div style="display: flex; gap: 20px; overflow-x: auto;">
+            <!-- Slot 1 -->
+            <div class="slot-control" id="slot1"
+                style="flex: 1; min-width: 300px; background: #151515; padding: 10px; border-radius: 6px;">
+                <h4 style="margin-top:0; color: #4caf50;">Slot 1</h4>
+                <label>Title:</label>
+                <div style="display:flex; gap:5px; margin-bottom: 10px;">
+                    <input type="text" id="titleInput1" value="Video Title 1" oninput="update(1)"
+                        style="flex:1; min-width:0; margin-right:0;">
+                    <button onclick="copyTitle(1)" title="Copy to Clipboard"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Copy</button>
+                    <button onclick="pasteTitle(1)" title="Paste from Clipboard"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Paste</button>
+                </div>
+
+                <label>Image:</label>
+                <div style="display:flex; gap:5px; margin-bottom: 5px;">
+                    <input type="text" id="imgInput1" placeholder="URL or drop file..." oninput="update(1)"
+                        style="flex:1; min-width:0; margin-right:0;">
+                    <button onclick="triggerFile(1)"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Open</button>
+                </div>
+                <input type="file" id="fileInput1" style="display: none;" accept="image/*"
+                    onchange="handleFile(this, 1)">
+                <div class="drop-zone" id="dropZone1"
+                    style="border: 2px dashed #333; padding: 10px; text-align: center; color: #777; font-size: 12px; border-radius: 4px;">
+                    Drop Image Here
+                </div>
+            </div>
+
+            <!-- Slot 2 -->
+            <div class="slot-control" id="slot2"
+                style="flex: 1; min-width: 300px; background: #151515; padding: 10px; border-radius: 6px;">
+                <h4 style="margin-top:0; color: #2196f3;">Slot 2</h4>
+                <label>Title:</label>
+                <div style="display:flex; gap:5px; margin-bottom: 10px;">
+                    <input type="text" id="titleInput2" value="Video Title 2" oninput="update(2)"
+                        style="flex:1; min-width:0; margin-right:0;">
+                    <button onclick="copyTitle(2)" title="Copy to Clipboard"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Copy</button>
+                    <button onclick="pasteTitle(2)" title="Paste from Clipboard"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Paste</button>
+                </div>
+
+                <label>Image:</label>
+                <div style="display:flex; gap:5px; margin-bottom: 5px;">
+                    <input type="text" id="imgInput2" placeholder="URL or drop file..." oninput="update(2)"
+                        style="flex:1; min-width:0; margin-right:0;">
+                    <button onclick="triggerFile(2)"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Open</button>
+                </div>
+                <input type="file" id="fileInput2" style="display: none;" accept="image/*"
+                    onchange="handleFile(this, 2)">
+                <div class="drop-zone" id="dropZone2"
+                    style="border: 2px dashed #333; padding: 10px; text-align: center; color: #777; font-size: 12px; border-radius: 4px;">
+                    Drop Image Here
+                </div>
+            </div>
+
+            <!-- Slot 3 -->
+            <div class="slot-control" id="slot3"
+                style="flex: 1; min-width: 300px; background: #151515; padding: 10px; border-radius: 6px;">
+                <h4 style="margin-top:0; color: #e91e63;">Slot 3</h4>
+                <label>Title:</label>
+                <div style="display:flex; gap:5px; margin-bottom: 10px;">
+                    <input type="text" id="titleInput3" value="Video Title 3" oninput="update(3)"
+                        style="flex:1; min-width:0; margin-right:0;">
+                    <button onclick="copyTitle(3)" title="Copy to Clipboard"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Copy</button>
+                    <button onclick="pasteTitle(3)" title="Paste from Clipboard"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Paste</button>
+                </div>
+
+                <label>Image:</label>
+                <div style="display:flex; gap:5px; margin-bottom: 5px;">
+                    <input type="text" id="imgInput3" placeholder="URL or drop file..." oninput="update(3)"
+                        style="flex:1; min-width:0; margin-right:0;">
+                    <button onclick="triggerFile(3)"
+                        style="padding: 4px 8px; background: #333; border: 1px solid #555; color: white; cursor: pointer;">Open</button>
+                </div>
+                <input type="file" id="fileInput3" style="display: none;" accept="image/*"
+                    onchange="handleFile(this, 3)">
+                <div class="drop-zone" id="dropZone3"
+                    style="border: 2px dashed #333; padding: 10px; text-align: center; color: #777; font-size: 12px; border-radius: 4px;">
+                    Drop Image Here
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mockup-area">
+        <!-- Sidebar Column -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <h4 style="color:#aaa; margin-bottom: 10px;">Suggested / Sidebar</h4>
+
+            <!-- Sidebar Item 1 -->
+            <div style="border-left: 3px solid #4caf50; padding-left: 8px;">
+                <div class="sidebar-item">
+                    <div class="sidebar-thumb">
+                        <img id="sb-img-1" src="https://via.placeholder.com/1280x720/333/fff?text=SLOT+1" alt="">
+                        <div class="time-badge">10:05:10</div>
+                    </div>
+                    <div class="sidebar-meta">
+                        <div class="sidebar-title" id="sb-title-1">Title 1</div>
+                        <div class="sidebar-channel channel-name">Channel Name</div>
+                        <div class="sidebar-stats">1.7K views • 2 hours ago</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Item 2 -->
+            <div style="border-left: 3px solid #2196f3; padding-left: 8px;">
+                <div class="sidebar-item">
+                    <div class="sidebar-thumb">
+                        <img id="sb-img-2" src="https://via.placeholder.com/1280x720/333/fff?text=SLOT+2" alt="">
+                        <div class="time-badge">10:05:10</div>
+                    </div>
+                    <div class="sidebar-meta">
+                        <div class="sidebar-title" id="sb-title-2">Title 2</div>
+                        <div class="sidebar-channel channel-name">Channel Name</div>
+                        <div class="sidebar-stats">1.7K views • 2 hours ago</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Item 3 -->
+            <div style="border-left: 3px solid #e91e63; padding-left: 8px;">
+                <div class="sidebar-item">
+                    <div class="sidebar-thumb">
+                        <img id="sb-img-3" src="https://via.placeholder.com/1280x720/333/fff?text=SLOT+3" alt="">
+                        <div class="time-badge">10:05:10</div>
+                    </div>
+                    <div class="sidebar-meta">
+                        <div class="sidebar-title" id="sb-title-3">Title 3</div>
+                        <div class="sidebar-channel channel-name">Channel Name</div>
+                        <div class="sidebar-stats">1.7K views • 2 hours ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Column -->
+        <div>
+            <h4 style="color:#aaa; margin-bottom: 10px;">Home Page / Search</h4>
+
+            <div id="homeContainer" style="display: flex; flex-direction: row; gap: 20px; flex-wrap: wrap;">
+                <!-- Home Item 1 -->
+                <div style="border-left: 3px solid #4caf50; padding-left: 12px;">
+                    <div class="home-item">
+                        <div class="home-thumb">
+                            <img id="hm-img-1" src="https://via.placeholder.com/1280x720/333/fff?text=SLOT+1" alt="">
+                            <div class="time-badge" style="bottom: 8px; right: 8px;">10:05:10</div>
+                        </div>
+                        <div class="home-meta">
+                            <div class="home-avatar"></div>
+                            <div class="home-info">
+                                <div class="home-title" id="hm-title-1">Title 1</div>
+                                <div class="home-stats">
+                                    <span class="channel-name">Channel Name</span><br>
+                                    1.7K views • 2 hours ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Home Item 2 -->
+                <div style="border-left: 3px solid #2196f3; padding-left: 12px;">
+                    <div class="home-item">
+                        <div class="home-thumb">
+                            <img id="hm-img-2" src="https://via.placeholder.com/1280x720/333/fff?text=SLOT+2" alt="">
+                            <div class="time-badge" style="bottom: 8px; right: 8px;">10:05:10</div>
+                        </div>
+                        <div class="home-meta">
+                            <div class="home-avatar"></div>
+                            <div class="home-info">
+                                <div class="home-title" id="hm-title-2">Title 2</div>
+                                <div class="home-stats">
+                                    <span class="channel-name">Channel Name</span><br>
+                                    1.7K views • 2 hours ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Home Item 3 -->
+                <div style="border-left: 3px solid #e91e63; padding-left: 12px;">
+                    <div class="home-item">
+                        <div class="home-thumb">
+                            <img id="hm-img-3" src="https://via.placeholder.com/1280x720/333/fff?text=SLOT+3" alt="">
+                            <div class="time-badge" style="bottom: 8px; right: 8px;">10:05:10</div>
+                        </div>
+                        <div class="home-meta">
+                            <div class="home-avatar"></div>
+                            <div class="home-info">
+                                <div class="home-title" id="hm-title-3">Title 3</div>
+                                <div class="home-stats">
+                                    <span class="channel-name">Channel Name</span><br>
+                                    1.7K views • 2 hours ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function update(slot) {
+            if (!slot) return;
+
+            const title = document.getElementById(`titleInput${slot}`).value;
+            const img = document.getElementById(`imgInput${slot}`).value;
+            const channel = document.getElementById('channelInput').value;
+            const showHour = document.getElementById('showHour').checked;
+
+            // Update Time Badges (All)
+            const timeText = showHour ? "10:05:10" : "05:10";
+            document.querySelectorAll('.time-badge').forEach(el => el.innerText = timeText);
+
+            // Update Channel Names (All)
+            document.querySelectorAll('.channel-name').forEach(el => el.innerText = channel);
+
+            // Update Slot Specifics
+            document.getElementById(`sb-title-${slot}`).innerText = title;
+            if (img) document.getElementById(`sb-img-${slot}`).src = img;
+
+            document.getElementById(`hm-title-${slot}`).innerText = title;
+            if (img) document.getElementById(`hm-img-${slot}`).src = img;
+        }
+
+        function updateAll() {
+            update(1);
+            update(2);
+            update(3);
+            updateLayout();
+        }
+
+        function updateLayout() {
+            const isRow = document.getElementById('homeLayout').checked;
+            const container = document.getElementById('homeContainer');
+            container.style.flexDirection = isRow ? 'row' : 'column';
+        }
+
+        // File Input Handling
+        function triggerFile(slot) {
+            document.getElementById(`fileInput${slot}`).click();
+        }
+
+        function handleFile(input, slot) {
+            const file = input.files[0];
+            if (file) {
+                readFile(file, slot);
+            }
+        }
+
+        function readFile(file, slot) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imgUrl = e.target.result;
+                document.getElementById(`imgInput${slot}`).value = imgUrl;
+                update(slot);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Drag and Drop Handling per slot
+        function setupDropZone(slot) {
+            const dropZone = document.getElementById(`dropZone${slot}`);
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#fff';
+                dropZone.style.background = '#333';
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#333';
+                dropZone.style.background = 'transparent';
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#333';
+                dropZone.style.background = 'transparent';
+
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    readFile(e.dataTransfer.files[0], slot);
+                    e.dataTransfer.clearData();
+                }
+            });
+        }
+
+        // Setup global drag (defaults to focused or just ignored? Let's just do individual drop zones for safety)
+        // Or we can allow dropping on the slot-control div itself
+
+        setupDropZone(1);
+        setupDropZone(2);
+        setupDropZone(3);
+
+        // Clipboard Handling
+        function copyTitle(slot) {
+            const input = document.getElementById(`titleInput${slot}`);
+            if (input) {
+                navigator.clipboard.writeText(input.value).then(() => {
+                    // Optional: visuals
+                    // alert('Copied!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            }
+        }
+
+        async function pasteTitle(slot) {
+            try {
+                const text = await navigator.clipboard.readText();
+                const input = document.getElementById(`titleInput${slot}`);
+                if (input) {
+                    input.value = text;
+                    update(slot);
+                }
+            } catch (err) {
+                console.error('Failed to paste: ', err);
+            }
+        }
+
+        // Init
+        updateAll();
+    </script>
+
+</body>
+
+</html>
