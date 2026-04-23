@@ -90,6 +90,7 @@ h1 {
   font-weight: 800;
   background: linear-gradient(90deg, #fff, var(--accent-arch), var(--accent-rust));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 10px;
 }
