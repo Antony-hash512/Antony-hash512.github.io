@@ -121,6 +121,60 @@
             background: var(--accent-arch);
             color: white;
         }
+        .video-container {
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            opacity: 0;
+        }
+        .video-container.expanded {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 20px;
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 ratio */
+            height: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .video-toggle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            width: fit-content;
+        }
+        .video-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-arch);
+        }
+        .video-toggle-btn .icon {
+            transition: transform 0.3s ease;
+        }
+        .video-toggle-btn.active .icon {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
@@ -142,6 +196,17 @@
         </div>
         
         <section class="card" id="content">
+            <button class="video-toggle-btn" onclick="toggleVideo()" id="ui-video-btn">
+                <span class="icon">▼</span>
+                <span id="ui-video-text">Show Video</span>
+            </button>
+
+            <div class="video-container" id="video-container">
+                <div class="video-wrapper">
+                    <iframe id="yt-iframe" src="" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+
             <div id="markdown-content" class="markdown-body">
                 Загрузка...
             </div>
@@ -155,6 +220,8 @@
             ru: {
                 back: '← На главную',
                 raw: '📄 Raw Markdown',
+                videoShow: '📽️ Показать видео',
+                videoHide: '📽️ Скрыть видео',
                 loading: 'Загрузка дневника разработки...',
                 file: 'dev_diary.md',
                 title: 'Дневник разработки | YouTube Previewer'
@@ -162,11 +229,36 @@
             en: {
                 back: '← Back to Home',
                 raw: '📄 Raw Markdown',
+                videoShow: '📽️ Show Video',
+                videoHide: '📽️ Hide Video',
                 loading: 'Loading development diary...',
                 file: 'dev_diary_en.md',
                 title: 'Development Diary | YouTube Previewer'
             }
         };
+
+        function toggleVideo() {
+            const container = document.getElementById('video-container');
+            const btn = document.getElementById('video-toggle-btn');
+            const iframe = document.getElementById('yt-iframe');
+            const isExpanded = container.classList.toggle('expanded');
+            
+            document.getElementById('ui-video-btn').classList.toggle('active');
+            
+            // Lazy load iframe src
+            if (isExpanded && !iframe.src) {
+                iframe.src = "https://www.youtube.com/embed/zoRkIV6Nd8A";
+            }
+            
+            updateVideoBtnText();
+        }
+
+        function updateVideoBtnText() {
+            const container = document.getElementById('video-container');
+            const isExpanded = container.classList.contains('expanded');
+            const textKey = isExpanded ? 'videoHide' : 'videoShow';
+            document.getElementById('ui-video-text').innerText = translations[currentLang][textKey];
+        }
 
         function setLanguage(lang, updateURL = true) {
             currentLang = lang;
@@ -183,6 +275,7 @@
             document.getElementById('ui-raw').innerText = translations[lang].raw;
             document.getElementById('ui-raw').href = translations[lang].file;
             document.title = translations[lang].title;
+            updateVideoBtnText();
             
             // Update buttons
             document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
