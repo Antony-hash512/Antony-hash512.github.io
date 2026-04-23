@@ -115,3 +115,11 @@ Embed a demonstration YouTube video into the development diary, adding the abili
 - Created a container with smooth CSS animations (`max-height` and `opacity`) for a collapsible effect.
 - Set the `expanded` and `active` classes by default in the HTML and immediately defined the `src` link so the player was ready from the first second.
 - Added synchronization for the button text ("Show Video" / "Hide Video") based on the current language immediately upon page load.
+
+## Stage 5: Web Standards Compliance and CSS Linter Fixes (T' + 02:55)
+**Objective:**
+Resolve a linter warning related to the `background-clip` property used for gradient text.
+
+**What was done:**
+- Identified that the `-webkit-background-clip: text` property is an experimental, WebKit-specific feature.
+- To ensure cross-browser compatibility and adhere to web standards, we added the official `background-clip: text` property alongside the prefixed one in all files utilizing gradient text (`dev_diary.html`, `youtube-preview.html`, `index.css`).
