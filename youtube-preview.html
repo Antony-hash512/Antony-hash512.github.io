@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About YouTube Previewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .markdown-body {
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        .markdown-body h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #fff, var(--accent-arch), var(--accent-rust));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .markdown-body h2 {
+            font-size: 1.8rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: var(--accent-arch);
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 5px;
+        }
+        .markdown-body ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        .markdown-body ul li {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .markdown-body ul li::before {
+            content: '▹';
+            position: absolute;
+            left: -20px;
+            color: var(--accent-rust);
+        }
+        .markdown-body strong {
+            color: #fff;
+            font-weight: 600;
+        }
+        .markdown-body code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--accent-neon);
+        }
+        .markdown-body p {
+            margin-bottom: 15px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s, transform 0.3s;
+        }
+        .back-btn:hover {
+            color: var(--text-primary);
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="blob"></div>
+    <div class="blob blob-2"></div>
+
+    <main class="container">
+        <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        
+        <section class="card" id="content">
+            <div id="markdown-content" class="markdown-body">
+                Loading content...
+            </div>
+            
+            <div class="links-container" style="margin-top: 40px; grid-template-columns: 1fr;">
+                <a href="previewer.html" class="link-btn primary" id="previewer-link">
+                    <span>📺 Open YouTube Previewer App</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('youtube-preview.md')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    document.getElementById('markdown-content').innerHTML = marked.parse(text);
+                })
+                .catch(error => {
+                    document.getElementById('markdown-content').innerHTML = `<p style="color: #ff5555;">Error loading content: ${error.message}</p>`;
+                    console.error('Error fetching markdown:', error);
+                });
+        });
+
+        // Hover effect for the card
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>
