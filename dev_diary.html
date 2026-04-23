@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" id="html-tag">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,17 +80,46 @@
             transform: translateX(-5px);
         }
         .raw-link {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 12px;
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 5px;
-            margin-top: 10px;
-            transition: color 0.2s;
+            gap: 8px;
+            transition: all 0.3s ease;
         }
         .raw-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-neon);
             color: var(--accent-neon);
+            transform: translateY(-2px);
+        }
+        .lang-switcher {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 4px;
+            gap: 4px;
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .lang-btn.active {
+            background: var(--accent-arch);
+            color: white;
         }
     </style>
 </head>
@@ -100,34 +129,81 @@
     <div class="blob blob-2"></div>
 
     <main class="container">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-            <a href="index.html" class="back-btn">← На главную</a>
-            <a href="dev_diary.md" class="raw-link" target="_blank">📄 Raw Markdown</a>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+            <a href="index.html" class="back-btn" id="ui-back">← На главную</a>
+            
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="lang-switcher">
+                    <button class="lang-btn active" onclick="setLanguage('ru')" id="btn-ru">RU</button>
+                    <button class="lang-btn" onclick="setLanguage('en')" id="btn-en">EN</button>
+                </div>
+                <a href="dev_diary.md" class="raw-link" target="_blank" id="ui-raw">📄 Raw MD</a>
+            </div>
         </div>
         
         <section class="card" id="content">
             <div id="markdown-content" class="markdown-body">
-                Загрузка дневника разработки...
+                Загрузка...
             </div>
         </section>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            fetch('dev_diary.md')
+        let currentLang = 'ru';
+
+        const translations = {
+            ru: {
+                back: '← На главную',
+                raw: '📄 Raw Markdown',
+                loading: 'Загрузка дневника разработки...',
+                file: 'dev_diary.md',
+                title: 'Дневник разработки | YouTube Previewer'
+            },
+            en: {
+                back: '← Back to Home',
+                raw: '📄 Raw Markdown',
+                loading: 'Loading development diary...',
+                file: 'dev_diary_en.md',
+                title: 'Development Diary | YouTube Previewer'
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Update UI
+            document.getElementById('html-tag').lang = lang;
+            document.getElementById('ui-back').innerText = translations[lang].back;
+            document.getElementById('ui-raw').innerText = translations[lang].raw;
+            document.getElementById('ui-raw').href = translations[lang].file;
+            document.title = translations[lang].title;
+            
+            // Update buttons
+            document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            
+            loadMarkdown(translations[lang].file);
+        }
+
+        function loadMarkdown(filename) {
+            const contentDiv = document.getElementById('markdown-content');
+            contentDiv.innerHTML = translations[currentLang].loading;
+
+            fetch(filename)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Не удалось загрузить файл');
-                    }
+                    if (!response.ok) throw new Error('Failed to load');
                     return response.text();
                 })
                 .then(text => {
-                    document.getElementById('markdown-content').innerHTML = marked.parse(text);
+                    contentDiv.innerHTML = marked.parse(text);
                 })
                 .catch(error => {
-                    document.getElementById('markdown-content').innerHTML = `<p style="color: #ff5555;">Ошибка загрузки: ${error.message}</p>`;
-                    console.error('Error fetching markdown:', error);
+                    contentDiv.innerHTML = `<p style="color: #ff5555;">Error: ${error.message}</p>`;
                 });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMarkdown(translations[currentLang].file);
         });
 
         // Эффект наведения на карточку
