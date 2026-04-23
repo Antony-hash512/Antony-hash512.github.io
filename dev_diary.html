@@ -168,8 +168,14 @@
             }
         };
 
-        function setLanguage(lang) {
+        function setLanguage(lang, updateURL = true) {
             currentLang = lang;
+            
+            // Update URL without reloading
+            if (updateURL) {
+                const newURL = window.location.protocol + "//" + window.location.host + window.location.pathname + '?lang=' + lang;
+                window.history.pushState({ path: newURL }, '', newURL);
+            }
             
             // Update UI
             document.getElementById('html-tag').lang = lang;
@@ -203,7 +209,15 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadMarkdown(translations[currentLang].file);
+            // Check URL parameters for language
+            const urlParams = new URLSearchParams(window.location.search);
+            const langParam = urlParams.get('lang');
+            
+            if (langParam && translations[langParam]) {
+                setLanguage(langParam, false);
+            } else {
+                loadMarkdown(translations[currentLang].file);
+            }
         });
 
         // Эффект наведения на карточку
