@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antony-hash512 | Developer Portfolio</title>
+    <meta name="description" content="Personal portfolio of Antony-hash512, an Arch Linux enthusiast, Rust developer, and Godot engine explorer.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="blob"></div>
+    <div class="blob blob-2"></div>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div style="display: flex; justify-content: center;">
+                <div class="profile-img" style="background: linear-gradient(135deg, var(--accent-arch), var(--accent-rust)); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">
+                    AH
+                </div>
+            </div>
+            <h1>Antony-hash512</h1>
+            <p class="subtitle">👋 I use Arch, btw.</p>
+        </section>
+
+        <!-- Core Projects / Links -->
+        <section class="card" id="projects" style="animation-delay: 0.2s;">
+            <h2 class="section-title">🚀 Featured Projects</h2>
+            <div class="links-container">
+                <a href="previewer.html" class="link-btn primary" id="previewer-link">
+                    <span>📺 YouTube Previewer</span>
+                </a>
+                <a href="dev_diary.md" class="link-btn" id="diary-link">
+                    <span>📓 Dev Diary</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section class="card" id="tech-stack" style="animation-delay: 0.4s;">
+            <h2 class="section-title">🛠️ Tech Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-item">🐧 Arch Linux</div>
+                <div class="tech-item">🦀 Rust</div>
+                <div class="tech-item">🎮 Godot</div>
+                <div class="tech-item">🐚 Fish Shell</div>
+                <div class="tech-item">📝 Neovim</div>
+                <div class="tech-item">🐳 Docker</div>
+                <div class="tech-item">🐍 Python (uv)</div>
+                <div class="tech-item">🎨 Blender</div>
+            </div>
+            
+            <div class="skills-box" style="margin-top: 30px; text-align: center;">
+                <img src="https://skillicons.dev/icons?i=obsidian,regex,linux,arch,kali,mint,ubuntu,debian,nix,vim,neovim,vscode,bash,py,lua,rust,cs,cpp,c,git,github,gitlab,svg,blender,godot,haxe,haxeflixel,bevy,unity,unreal,docker,kubernetes,html,css,js,ts,nodejs,nginx,sqlite,qt,gtk,raspberrypi,arduino,androidstudio,selenium" alt="My Skills">
+            </div>
+        </section>
+
+        <!-- Resources -->
+        <section class="card" id="resources" style="animation-delay: 0.6s;">
+            <h2 class="section-title">📂 Resources & Dotfiles</h2>
+            <div class="links-container">
+                <a href="https://github.com/Antony-hash512/Antony-hash512_dotfiles" target="_blank" class="link-btn">
+                    <span>⚙️ Dotfiles</span>
+                </a>
+                <a href="https://github.com/Antony-hash512/Fish_functions_collection" target="_blank" class="link-btn">
+                    <span>🐚 Fish Functions</span>
+                </a>
+                <a href="https://gemini.google.com/share/20d5ff58d7f0" target="_blank" class="link-btn">
+                    <span>🧠 FLUX 2 vs FLUX 1</span>
+                </a>
+                <a href="https://github.com/Antony-hash512" target="_blank" class="link-btn">
+                    <span>🐙 GitHub Profile</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="social-footer" style="animation: fadeIn 2s ease-in;">
+            <p style="color: var(--text-secondary); font-size: 0.8rem;">&copy; 2026 Antony-hash512. Built with ❤️ and Rust-powered logic.</p>
+        </footer>
+    </main>
+
+    <script>
+        // Simple scroll reveal or micro-interactions can go here
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>
