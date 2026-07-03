@@ -4,10 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Godot 4 Running Animation Preview</title>
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'system';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
-    :root {
+    :root, [data-theme="dark"] {
       --bg-gradient: linear-gradient(135deg, #0f1115 0%, #151821 100%);
       --card-bg: rgba(22, 26, 36, 0.7);
       --card-border: rgba(255, 255, 255, 0.06);
@@ -17,6 +24,113 @@
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
       --success: #10b981;
+
+      /* Button Secondary */
+      --btn-sec-bg: rgba(255, 255, 255, 0.06);
+      --btn-sec-bg-hover: rgba(255, 255, 255, 0.1);
+      --btn-sec-border: rgba(255, 255, 255, 0.05);
+
+      /* Card shadow */
+      --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+      /* Controls Panel */
+      --controls-bg: rgba(10, 12, 18, 0.4);
+      --controls-border: rgba(255, 255, 255, 0.03);
+
+      /* Heading Secondary */
+      --heading-sec: #a5b4fc;
+
+      /* Canvas specific colors */
+      --canvas-bg: #171922;
+      --canvas-glow-start: #1c1f2b;
+      --canvas-glow-end: #11131a;
+      --hill-color: #212530;
+      --tree-trunk: #362b23;
+      --tree-leaves: #2b3a30;
+      --ground-color: #262b38;
+      --ground-line: #4f5e7c;
+
+      color-scheme: dark;
+    }
+
+    [data-theme="light"] {
+      --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #dbe2e9 100%);
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --accent: #4f46e5;
+      --accent-glow: rgba(79, 70, 229, 0.2);
+      --accent-hover: #3b82f6;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --success: #059669;
+
+      /* Button Secondary */
+      --btn-sec-bg: rgba(0, 0, 0, 0.05);
+      --btn-sec-bg-hover: rgba(0, 0, 0, 0.08);
+      --btn-sec-border: rgba(0, 0, 0, 0.06);
+
+      /* Card shadow */
+      --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+      /* Controls Panel */
+      --controls-bg: rgba(0, 0, 0, 0.03);
+      --controls-border: rgba(0, 0, 0, 0.04);
+
+      /* Heading Secondary */
+      --heading-sec: #4f46e5;
+
+      /* Canvas specific colors */
+      --canvas-bg: #f8fafc;
+      --canvas-glow-start: #ffffff;
+      --canvas-glow-end: #f1f5f9;
+      --hill-color: #cbd5e1;
+      --tree-trunk: #854d0e;
+      --tree-leaves: #16a34a;
+      --ground-color: #94a3b8;
+      --ground-line: #475569;
+
+      color-scheme: light;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]):not([data-theme="light"]) {
+        --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #dbe2e9 100%);
+        --card-bg: rgba(255, 255, 255, 0.75);
+        --card-border: rgba(0, 0, 0, 0.08);
+        --accent: #4f46e5;
+        --accent-glow: rgba(79, 70, 229, 0.2);
+        --accent-hover: #3b82f6;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --success: #059669;
+
+        /* Button Secondary */
+        --btn-sec-bg: rgba(0, 0, 0, 0.05);
+        --btn-sec-bg-hover: rgba(0, 0, 0, 0.08);
+        --btn-sec-border: rgba(0, 0, 0, 0.06);
+
+        /* Card shadow */
+        --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        /* Controls Panel */
+        --controls-bg: rgba(0, 0, 0, 0.03);
+        --controls-border: rgba(0, 0, 0, 0.04);
+
+        /* Heading Secondary */
+        --heading-sec: #4f46e5;
+
+        /* Canvas specific colors */
+        --canvas-bg: #f8fafc;
+        --canvas-glow-start: #ffffff;
+        --canvas-glow-end: #f1f5f9;
+        --hill-color: #cbd5e1;
+        --tree-trunk: #854d0e;
+        --tree-leaves: #16a34a;
+        --ground-color: #94a3b8;
+        --ground-line: #475569;
+
+        color-scheme: light;
+      }
     }
 
     * {
@@ -36,6 +150,7 @@
       justify-content: center;
       padding: 2rem;
       overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .container {
@@ -57,6 +172,7 @@
       letter-spacing: -0.025em;
       background: linear-gradient(to right, #a5b4fc, #818cf8, #6366f1);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 0.5rem;
     }
@@ -74,23 +190,25 @@
       border: 1px solid var(--card-border);
       border-radius: 24px;
       padding: 2rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--card-shadow);
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1.5rem;
       animation: fadeInUp 0.8s ease-out;
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .canvas-container {
       position: relative;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-      background: #111318;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 0 0 1px var(--card-border);
+      background: var(--canvas-bg);
       width: 100%;
       aspect-ratio: 4 / 3;
       max-height: 500px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     canvas {
@@ -107,10 +225,11 @@
       gap: 1.5rem;
       justify-content: space-between;
       align-items: center;
-      background: rgba(10, 12, 18, 0.4);
+      background: var(--controls-bg);
       padding: 1.25rem;
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--controls-border);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .control-group {
@@ -151,14 +270,15 @@
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--btn-sec-bg);
       color: var(--text-main);
       box-shadow: none;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--btn-sec-border);
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--btn-sec-bg-hover);
       box-shadow: none;
     }
 
@@ -172,6 +292,7 @@
 
     input[type="range"] {
       -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       height: 6px;
       border-radius: 3px;
@@ -181,6 +302,7 @@
 
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
+      appearance: none;
       width: 18px;
       height: 18px;
       border-radius: 50%;
@@ -207,13 +329,79 @@
       border: 1px solid var(--card-border);
       border-radius: 20px;
       padding: 1.5rem;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .file-structure h2 {
       font-size: 1.25rem;
       font-weight: 600;
       margin-bottom: 1rem;
-      color: #a5b4fc;
+      color: var(--heading-sec);
+      transition: color 0.3s ease;
+    }
+
+    /* Theme Switcher Styles */
+    .header-top {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-bottom: -0.5rem;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .theme-switcher {
+      display: inline-flex;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      padding: 4px;
+      border-radius: 30px;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 20px;
+      transition: color 0.3s ease;
+      z-index: 2;
+      position: relative;
+      outline: none;
+    }
+
+    .theme-btn:hover {
+      color: var(--text-main);
+    }
+
+    .theme-btn.active {
+      color: #ffffff;
+    }
+
+    .theme-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2.2;
+    }
+
+    .theme-indicator {
+      position: absolute;
+      border-radius: 20px;
+      background: var(--accent);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease, height 0.3s ease;
+      z-index: 1;
+      box-shadow: 0 3px 10px var(--accent-glow);
     }
 
     .file-list {
@@ -275,6 +463,23 @@
 <body>
 
   <div class="container">
+    <div class="header-top">
+      <div class="theme-switcher">
+        <button class="theme-btn" data-theme-value="light" aria-label="Light theme">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <span>Light</span>
+        </button>
+        <button class="theme-btn" data-theme-value="dark" aria-label="Dark theme">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <span>Dark</span>
+        </button>
+        <button class="theme-btn" data-theme-value="system" aria-label="System theme">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          <span>System</span>
+        </button>
+        <div class="theme-indicator"></div>
+      </div>
+    </div>
     <header>
       <h1>Godot Running Animation</h1>
       <p class="subtitle">HTML5 interactive simulation of the Godot spritesheet running animation</p>
@@ -324,6 +529,18 @@
     const img = new Image();
     img.src = 'assets/images/spritesheet.png';
 
+    // Themeable colors for the canvas simulation
+    const themeColors = {
+      canvasBg: '#171922',
+      canvasGlowStart: '#1c1f2b',
+      canvasGlowEnd: '#11131a',
+      hillColor: '#212530',
+      treeTrunk: '#362b23',
+      treeLeaves: '#2b3a30',
+      groundColor: '#262b38',
+      groundLine: '#4f5e7c'
+    };
+
     // State variables
     let isPlaying = true;
     let flipH = false;
@@ -346,7 +563,7 @@
           w: 180 + Math.random() * 120,
           h: 100 + Math.random() * 100,
           speedFactor: 0.3,
-          color: '#212530'
+          color: themeColors.hillColor
         });
       }
       // 6 Trees
@@ -358,8 +575,8 @@
           leavesW: 55,
           leavesH: 75,
           speedFactor: 0.8,
-          trunkColor: '#362b23',
-          leavesColor: '#2b3a30'
+          trunkColor: themeColors.treeTrunk,
+          leavesColor: themeColors.treeLeaves
         });
       }
     }
@@ -415,13 +632,13 @@
 
     function draw() {
       // Clear canvas
-      ctx.fillStyle = '#171922';
+      ctx.fillStyle = themeColors.canvasBg;
       ctx.fillRect(0, 0, 800, 600);
 
       // Draw Sky Glow
       const glow = ctx.createRadialGradient(400, 300, 100, 400, 300, 500);
-      glow.addColorStop(0, '#1c1f2b');
-      glow.addColorStop(1, '#11131a');
+      glow.addColorStop(0, themeColors.canvasGlowStart);
+      glow.addColorStop(1, themeColors.canvasGlowEnd);
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, 800, 450);
 
@@ -453,11 +670,11 @@
       });
 
       // Draw Ground
-      ctx.fillStyle = '#262b38';
+      ctx.fillStyle = themeColors.groundColor;
       ctx.fillRect(0, 450, 800, 150);
 
       // Ground Line
-      ctx.fillStyle = '#4f5e7c';
+      ctx.fillStyle = themeColors.groundLine;
       ctx.fillRect(0, 450, 800, 4);
 
       // Draw Character
@@ -492,7 +709,7 @@
         ctx.restore();
       } else {
         // Fallback text if image not loaded
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = themeColors.groundLine;
         ctx.font = '16px Outfit';
         ctx.fillText('Loading spritesheet...', 350, 360);
       }
@@ -519,6 +736,87 @@
       speedVal.textContent = speedScale.toFixed(1) + 'x';
     });
 
+    // Theme Switcher Wiring
+    const switcher = document.querySelector('.theme-switcher');
+    const indicator = document.querySelector('.theme-indicator');
+    const buttons = document.querySelectorAll('.theme-btn');
+
+    function updateCanvasColors() {
+      const computedStyle = getComputedStyle(document.documentElement);
+      themeColors.canvasBg = computedStyle.getPropertyValue('--canvas-bg').trim();
+      themeColors.canvasGlowStart = computedStyle.getPropertyValue('--canvas-glow-start').trim();
+      themeColors.canvasGlowEnd = computedStyle.getPropertyValue('--canvas-glow-end').trim();
+      themeColors.hillColor = computedStyle.getPropertyValue('--hill-color').trim();
+      themeColors.treeTrunk = computedStyle.getPropertyValue('--tree-trunk').trim();
+      themeColors.treeLeaves = computedStyle.getPropertyValue('--tree-leaves').trim();
+      themeColors.groundColor = computedStyle.getPropertyValue('--ground-color').trim();
+      themeColors.groundLine = computedStyle.getPropertyValue('--ground-line').trim();
+
+      // Update color properties of live objects
+      hills.forEach(hill => {
+        hill.color = themeColors.hillColor;
+      });
+      trees.forEach(tree => {
+        tree.trunkColor = themeColors.treeTrunk;
+        tree.leavesColor = themeColors.treeLeaves;
+      });
+    }
+
+    function updateIndicator(activeBtn) {
+      if (!activeBtn || !indicator || !switcher) return;
+      indicator.style.left = '0px';
+      indicator.style.top = '0px';
+      indicator.style.transform = `translate(${activeBtn.offsetLeft}px, ${activeBtn.offsetTop}px)`;
+      indicator.style.width = `${activeBtn.offsetWidth}px`;
+      indicator.style.height = `${activeBtn.offsetHeight}px`;
+    }
+
+    let currentTheme = localStorage.getItem('theme') || 'system';
+
+    function setTheme(theme) {
+      currentTheme = theme;
+      localStorage.setItem('theme', theme);
+      document.documentElement.setAttribute('data-theme', theme);
+      
+      buttons.forEach(btn => {
+        const isActive = btn.getAttribute('data-theme-value') === theme;
+        btn.classList.toggle('active', isActive);
+        if (isActive) {
+          updateIndicator(btn);
+        }
+      });
+
+      // Allow CSS variables to update before reading computed style
+      requestAnimationFrame(() => {
+        updateCanvasColors();
+      });
+    }
+
+    // Attach click listeners to theme switcher buttons
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTheme(btn.getAttribute('data-theme-value'));
+      });
+    });
+
+    // Handle OS preference changes dynamically when set to system theme
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    mediaQuery.addEventListener('change', () => {
+      if (currentTheme === 'system') {
+        requestAnimationFrame(() => {
+          updateCanvasColors();
+        });
+      }
+    });
+
+    // Handle window resize to keep the indicator aligned
+    window.addEventListener('resize', () => {
+      const activeBtn = document.querySelector('.theme-btn.active');
+      if (activeBtn) {
+        updateIndicator(activeBtn);
+      }
+    });
+
     // Start loop
     img.onload = () => {
       requestAnimationFrame(loop);
@@ -527,6 +825,13 @@
     if (img.complete) {
       requestAnimationFrame(loop);
     }
+
+    // Initialize theme position and canvas colors after initial render
+    setTheme(currentTheme);
+    requestAnimationFrame(() => {
+      const activeBtn = document.querySelector('.theme-btn.active');
+      if (activeBtn) updateIndicator(activeBtn);
+    });
   </script>
 </body>
 </html>
