@@ -324,29 +324,54 @@
       min-width: 45px;
     }
 
-    .file-structure {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 1.5rem;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-    }
-
-    .file-structure h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--heading-sec);
-      transition: color 0.3s ease;
-    }
-
-    /* Theme Switcher Styles */
+    /* Header Top Navigation & Switcher */
     .header-top {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
       width: 100%;
       margin-bottom: -0.5rem;
       animation: fadeInDown 0.8s ease-out;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-link svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s ease;
+    }
+
+    .nav-link:hover svg {
+      transform: scale(1.1);
     }
 
     .theme-switcher {
@@ -404,28 +429,7 @@
       box-shadow: 0 3px 10px var(--accent-glow);
     }
 
-    .file-list {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
 
-    .file-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .file-icon {
-      color: var(--accent-hover);
-    }
-
-    .dir-icon {
-      color: #eab308;
-    }
 
     @keyframes fadeInDown {
       from {
@@ -450,6 +454,15 @@
     }
 
     @media (max-width: 640px) {
+      .header-top {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+      }
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+      }
       .controls-panel {
         flex-direction: column;
         align-items: stretch;
@@ -464,6 +477,16 @@
 
   <div class="container">
     <div class="header-top">
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <span>Back to Home</span>
+        </a>
+        <a href="https://github.com/Antony-hash512/running-animation-test" target="_blank" class="nav-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+          <span>GitHub Repo</span>
+        </a>
+      </nav>
       <div class="theme-switcher">
         <button class="theme-btn" data-theme-value="light" aria-label="Light theme">
           <svg class="icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
@@ -504,18 +527,7 @@
       </div>
     </div>
 
-    <div class="file-structure">
-      <h2>Godot Project Files Created</h2>
-      <ul class="file-list">
-        <li class="file-item"><span class="file-icon dir-icon">📁</span> assets/images/</li>
-        <li class="file-item" style="padding-left: 1.5rem;"><span class="file-icon">🖼️</span> spritesheet.png (Chroma-keyed transparent spritesheet)</li>
-        <li class="file-item" style="padding-left: 1.5rem;"><span class="file-icon">🖼️</span> ComfyUI_00534_.png (Original raw image)</li>
-        <li class="file-item"><span class="file-icon">⚙️</span> project.godot (Project configuration file)</li>
-        <li class="file-item"><span class="file-icon">🎬</span> run_animation.tscn (Main Scene file with Sprite2D and AnimationPlayer)</li>
-        <li class="file-item"><span class="file-icon">📜</span> run_animation.gd (GDScript for scrolling parallax and controls)</li>
-        <li class="file-item"><span class="file-icon">🌐</span> view_animation.html (This browser interactive preview)</li>
-      </ul>
-    </div>
+
   </div>
 
   <script>
