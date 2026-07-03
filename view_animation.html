@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Godot 4 Running Animation Preview</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f1115 0%, #151821 100%);
+      --card-bg: rgba(22, 26, 36, 0.7);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --accent: #4f46e5;
+      --accent-glow: rgba(79, 70, 229, 0.4);
+      --accent-hover: #6366f1;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    header {
+      text-align: center;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(to right, #a5b4fc, #818cf8, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    .main-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .canvas-container {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      background: #111318;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      max-height: 500px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .controls-panel {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 12, 18, 0.4);
+      padding: 1.25rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .control-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px var(--accent-glow);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-grow: 1;
+      max-width: 300px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-glow);
+      transition: transform 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .speed-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--success);
+      font-weight: bold;
+      min-width: 45px;
+    }
+
+    .file-structure {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 1.5rem;
+    }
+
+    .file-structure h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #a5b4fc;
+    }
+
+    .file-list {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .file-icon {
+      color: var(--accent-hover);
+    }
+
+    .dir-icon {
+      color: #eab308;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .controls-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .slider-container {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Godot Running Animation</h1>
+      <p class="subtitle">HTML5 interactive simulation of the Godot spritesheet running animation</p>
+    </header>
+
+    <div class="main-card">
+      <div class="canvas-container">
+        <canvas id="animCanvas"></canvas>
+      </div>
+
+      <div class="controls-panel">
+        <div class="control-group">
+          <button id="playPauseBtn" class="btn">Pause</button>
+          <button id="flipBtn" class="btn btn-secondary">Flip Direction</button>
+        </div>
+
+        <div class="control-group slider-container">
+          <span class="control-label">Speed</span>
+          <input type="range" id="speedSlider" min="0.1" max="3" step="0.1" value="1">
+          <span id="speedVal" class="speed-value">1.0x</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="file-structure">
+      <h2>Godot Project Files Created</h2>
+      <ul class="file-list">
+        <li class="file-item"><span class="file-icon dir-icon">📁</span> assets/images/</li>
+        <li class="file-item" style="padding-left: 1.5rem;"><span class="file-icon">🖼️</span> spritesheet.png (Chroma-keyed transparent spritesheet)</li>
+        <li class="file-item" style="padding-left: 1.5rem;"><span class="file-icon">🖼️</span> ComfyUI_00534_.png (Original raw image)</li>
+        <li class="file-item"><span class="file-icon">⚙️</span> project.godot (Project configuration file)</li>
+        <li class="file-item"><span class="file-icon">🎬</span> run_animation.tscn (Main Scene file with Sprite2D and AnimationPlayer)</li>
+        <li class="file-item"><span class="file-icon">📜</span> run_animation.gd (GDScript for scrolling parallax and controls)</li>
+        <li class="file-item"><span class="file-icon">🌐</span> view_animation.html (This browser interactive preview)</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('animCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set internal resolution
+    canvas.width = 800;
+    canvas.height = 600;
+
+    const img = new Image();
+    img.src = 'assets/images/spritesheet.png';
+
+    // State variables
+    let isPlaying = true;
+    let flipH = false;
+    let speedScale = 1.0;
+    let currentFrame = 0;
+    let frameTimer = 0;
+    const baseFrameDuration = 100; // ms per frame
+
+    // Parallax background elements
+    const baseScrollSpeed = 200; // px per second
+    const hills = [];
+    const trees = [];
+
+    // Initialize parallax objects
+    function initParallax() {
+      // 5 Hills
+      for (let i = 0; i < 5; i++) {
+        hills.push({
+          x: i * 220 + Math.random() * 50,
+          w: 180 + Math.random() * 120,
+          h: 100 + Math.random() * 100,
+          speedFactor: 0.3,
+          color: '#212530'
+        });
+      }
+      // 6 Trees
+      for (let i = 0; i < 7; i++) {
+        trees.push({
+          x: i * 160 + Math.random() * 40,
+          trunkW: 14,
+          trunkH: 55,
+          leavesW: 55,
+          leavesH: 75,
+          speedFactor: 0.8,
+          trunkColor: '#362b23',
+          leavesColor: '#2b3a30'
+        });
+      }
+    }
+
+    initParallax();
+
+    let lastTime = 0;
+    function loop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = (timestamp - lastTime) / 1000;
+      lastTime = timestamp;
+
+      update(dt);
+      draw();
+
+      requestAnimationFrame(loop);
+    }
+
+    function update(dt) {
+      if (!isPlaying) return;
+
+      // Update frame animation
+      frameTimer += dt * 1000 * speedScale;
+      if (frameTimer >= baseFrameDuration) {
+        frameTimer %= baseFrameDuration;
+        currentFrame = (currentFrame + 1) % 8;
+      }
+
+      // Parallax scroll direction based on flipH
+      const scrollDirection = flipH ? -1 : 1;
+      const scrollAmount = baseScrollSpeed * speedScale * scrollDirection * dt;
+
+      // Scroll Hills
+      hills.forEach(hill => {
+        hill.x -= scrollAmount * hill.speedFactor;
+        if (scrollDirection >= 0) {
+          if (hill.x < -hill.w) hill.x = 800 + Math.random() * 50;
+        } else {
+          if (hill.x > 800) hill.x = -hill.w - Math.random() * 50;
+        }
+      });
+
+      // Scroll Trees
+      trees.forEach(tree => {
+        tree.x -= scrollAmount * tree.speedFactor;
+        if (scrollDirection >= 0) {
+          if (tree.x < -tree.leavesW) tree.x = 800 + Math.random() * 40;
+        } else {
+          if (tree.x > 800) tree.x = -tree.leavesW - Math.random() * 40;
+        }
+      });
+    }
+
+    function draw() {
+      // Clear canvas
+      ctx.fillStyle = '#171922';
+      ctx.fillRect(0, 0, 800, 600);
+
+      // Draw Sky Glow
+      const glow = ctx.createRadialGradient(400, 300, 100, 400, 300, 500);
+      glow.addColorStop(0, '#1c1f2b');
+      glow.addColorStop(1, '#11131a');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, 800, 450);
+
+      // Draw Hills
+      hills.forEach(hill => {
+        ctx.fillStyle = hill.color;
+        ctx.beginPath();
+        ctx.moveTo(hill.x, 450);
+        ctx.lineTo(hill.x + hill.w / 2, 450 - hill.h);
+        ctx.lineTo(hill.x + hill.w, 450);
+        ctx.closePath();
+        ctx.fill();
+      });
+
+      // Draw Trees
+      trees.forEach(tree => {
+        // Trunk
+        ctx.fillStyle = tree.trunkColor;
+        ctx.fillRect(tree.x - tree.trunkW / 2, 450 - tree.trunkH, tree.trunkW, tree.trunkH);
+
+        // Leaves
+        ctx.fillStyle = tree.leavesColor;
+        ctx.beginPath();
+        ctx.moveTo(tree.x - tree.leavesW / 2, 450 - tree.trunkH);
+        ctx.lineTo(tree.x, 450 - tree.trunkH - tree.leavesH);
+        ctx.lineTo(tree.x + tree.leavesW / 2, 450 - tree.trunkH);
+        ctx.closePath();
+        ctx.fill();
+      });
+
+      // Draw Ground
+      ctx.fillStyle = '#262b38';
+      ctx.fillRect(0, 450, 800, 150);
+
+      // Ground Line
+      ctx.fillStyle = '#4f5e7c';
+      ctx.fillRect(0, 450, 800, 4);
+
+      // Draw Character
+      if (img.complete) {
+        const frameW = img.width / 4;
+        const frameH = img.height / 2;
+        const col = currentFrame % 4;
+        const row = Math.floor(currentFrame / 4);
+
+        ctx.save();
+        
+        // Character position
+        const charX = 400;
+        const charY = 360;
+
+        if (flipH) {
+          ctx.translate(charX, charY);
+          ctx.scale(-1, 1);
+          ctx.drawImage(
+            img,
+            col * frameW, row * frameH, frameW, frameH,
+            -frameW / 2, -frameH / 2, frameW, frameH
+          );
+        } else {
+          ctx.drawImage(
+            img,
+            col * frameW, row * frameH, frameW, frameH,
+            charX - frameW / 2, charY - frameH / 2, frameW, frameH
+          );
+        }
+        
+        ctx.restore();
+      } else {
+        // Fallback text if image not loaded
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '16px Outfit';
+        ctx.fillText('Loading spritesheet...', 350, 360);
+      }
+    }
+
+    // Control wiring
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const flipBtn = document.getElementById('flipBtn');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedVal = document.getElementById('speedVal');
+
+    playPauseBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      playPauseBtn.classList.toggle('btn-secondary', !isPlaying);
+    });
+
+    flipBtn.addEventListener('click', () => {
+      flipH = !flipH;
+    });
+
+    speedSlider.addEventListener('input', (e) => {
+      speedScale = parseFloat(e.target.value);
+      speedVal.textContent = speedScale.toFixed(1) + 'x';
+    });
+
+    // Start loop
+    img.onload = () => {
+      requestAnimationFrame(loop);
+    };
+    // If cached
+    if (img.complete) {
+      requestAnimationFrame(loop);
+    }
+  </script>
+</body>
+</html>
