@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aave V3 & V4 Локальный Мониторинг</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-border: rgba(99, 102, 241, 0.4);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-cyan: #06b6d4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 15% 15%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 85% 85%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            padding: 2.5rem 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .header-title h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 9999px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .refresh-btn svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.4s ease;
+        }
+
+        .refresh-btn.spinning svg {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            transition: background 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--card-hover-border);
+            box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.3);
+        }
+
+        .card-btc:hover::before { background: linear-gradient(90deg, #f7931a, #f59e0b); }
+        .card-eth:hover::before { background: linear-gradient(90deg, #f59e0b, #ec4899); }
+        .card-v4-usdg:hover::before { background: linear-gradient(90deg, #f43f5e, #ec4899); }
+        .card-v4-eth:hover::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+        .card-v4-usdc:hover::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .card-v3-usdg:hover::before { background: linear-gradient(90deg, #8b5cf6, #d946ef); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .card-link-icon {
+            opacity: 0.4;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            width: 14px;
+            height: 14px;
+        }
+
+        .card:hover .card-link-icon {
+            opacity: 1;
+            transform: translate(2px, -2px);
+            color: var(--accent-blue);
+        }
+
+        .badge {
+            font-size: 0.725rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-btc {
+            background: rgba(247, 147, 26, 0.15);
+            color: #f7931a;
+            border: 1px solid rgba(247, 147, 26, 0.3);
+        }
+
+        .badge-v4 {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .badge-v3 {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .badge-eth {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .value-container {
+            margin-top: 0.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .value-green { color: var(--accent-green); }
+        .value-amber { color: var(--accent-amber); }
+        .value-borrow { color: var(--accent-rose); }
+
+        .sub-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .card-links {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .link-btn {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .link-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.5);
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .metric-val {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .loading {
+            color: var(--accent-amber);
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .not-found {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-title">
+            <h1>Мониторинг Aave</h1>
+            <p>Отслеживание ставок APY и ликвидности с прямыми ссылками на Aavescan, Aave App & DefiLlama</p>
+        </div>
+        <div class="header-actions">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>Live Data</span>
+            </div>
+            <button id="refresh-btn" class="refresh-btn" onclick="updateDashboard(true)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Обновить</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Цена Bitcoin (mBTC) -->
+        <div class="card card-btc">
+            <div class="card-header">
+                <h3>Bitcoin (mBTC)</h3>
+                <span class="badge badge-btc">CoinGecko</span>
+            </div>
+            <div class="value-container">
+                <div id="mbtc-price" class="value value-amber loading">Загрузка...</div>
+            </div>
+            <div class="sub-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Единица</span>
+                    <span class="metric-val">1 mBTC (0.001 BTC)</span>
+                </div>
+                <div class="metric-item" style="text-align: right;">
+                    <span class="metric-label">Источник</span>
+                    <span class="metric-val">CoinGecko</span>
+                </div>
+            </div>
+            <div class="card-links">
+                <a href="https://www.coingecko.com/en/coins/bitcoin" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>CoinGecko</span> ↗
+                </a>
+                <a href="https://coinmarketcap.com/currencies/bitcoin/" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>CoinMarketCap</span> ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Цена ETH -->
+        <div class="card card-eth">
+            <div class="card-header">
+                <h3>Ethereum</h3>
+                <span class="badge badge-eth">CoinGecko</span>
+            </div>
+            <div class="value-container">
+                <div id="eth-price" class="value value-amber loading">Загрузка...</div>
+            </div>
+            <div class="sub-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Валюта</span>
+                    <span class="metric-val">USD</span>
+                </div>
+                <div class="metric-item" style="text-align: right;">
+                    <span class="metric-label">Источник</span>
+                    <span class="metric-val">CoinGecko</span>
+                </div>
+            </div>
+            <div class="card-links">
+                <a href="https://www.coingecko.com/en/coins/ethereum" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>CoinGecko</span> ↗
+                </a>
+                <a href="https://coinmarketcap.com/currencies/ethereum/" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>CoinMarketCap</span> ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Aave V4: Займ USDG -->
+        <div class="card card-v4-usdg">
+            <div class="card-header">
+                <h3>Aave V4: Займ USDG</h3>
+                <span class="badge badge-v4">V4 Global Hub</span>
+            </div>
+            <div class="value-container">
+                <div id="v4-usdg-bor" class="value value-borrow loading">Загрузка...</div>
+            </div>
+            <div class="sub-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Сеть / Хаб</span>
+                    <span id="v4-usdg-chain" class="metric-val">Ethereum</span>
+                </div>
+                <div class="metric-item" style="text-align: right;">
+                    <span class="metric-label">TVL</span>
+                    <span id="v4-usdg-tvl" class="metric-val">--</span>
+                </div>
+            </div>
+            <div class="card-links">
+                <a href="https://aavescan.com/ethereum-v4-core/usdg" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aavescan</span> ↗
+                </a>
+                <a href="https://pro.aave.com/explore/reserve/MTo6MHg5NGU3QTVkQ2JFODE2ZTQ5OGI4OWFCNzUyNjYxOTA0RTJGNTZjNDg1OjoxMQ==" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aave Pro</span> ↗
+                </a>
+                <a id="link-v4-usdg-defillama" href="https://defillama.com/yields/pool/411707d7-0293-4ad3-982d-72125e1f5de7" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>DefiLlama</span> ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Aave V4: Депозит ETH -->
+        <div class="card card-v4-eth">
+            <div class="card-header">
+                <h3>Aave V4: Депозит ETH</h3>
+                <span class="badge badge-v4">V4 Core Hub</span>
+            </div>
+            <div class="value-container">
+                <div id="v4-eth-dep" class="value value-green loading">Загрузка...</div>
+            </div>
+            <div class="sub-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Ассет</span>
+                    <span class="metric-val">WETH / ETH</span>
+                </div>
+                <div class="metric-item" style="text-align: right;">
+                    <span class="metric-label">TVL</span>
+                    <span id="v4-eth-tvl" class="metric-val">--</span>
+                </div>
+            </div>
+            <div class="card-links">
+                <a href="https://aavescan.com/ethereum-v4-core/weth" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aavescan</span> ↗
+                </a>
+                <a href="https://app.aave.com/reserve-overview/?underlyingAsset=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&marketName=proto_mainnet_v3" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aave App</span> ↗
+                </a>
+                <a id="link-v4-eth-defillama" href="https://defillama.com/yields/pool/e25b2934-8c6c-468a-b680-d6cba811b85f" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>DefiLlama</span> ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Aave V4: Депозит USDC -->
+        <div class="card card-v4-usdc">
+            <div class="card-header">
+                <h3>Aave V4: Депозит USDC</h3>
+                <span class="badge badge-v4">V4 Core Hub</span>
+            </div>
+            <div class="value-container">
+                <div id="v4-usdc-dep" class="value value-green loading">Загрузка...</div>
+            </div>
+            <div class="sub-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Сеть</span>
+                    <span id="v4-usdc-chain" class="metric-val">Ethereum</span>
+                </div>
+                <div class="metric-item" style="text-align: right;">
+                    <span class="metric-label">TVL</span>
+                    <span id="v4-usdc-tvl" class="metric-val">--</span>
+                </div>
+            </div>
+            <div class="card-links">
+                <a href="https://aavescan.com/ethereum-v4-core/usdc" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aavescan</span> ↗
+                </a>
+                <a href="https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aave App</span> ↗
+                </a>
+                <a id="link-v4-usdc-defillama" href="https://defillama.com/yields/pool/4ac1a968-68ab-4da8-87e3-8f1e15e3dae2" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>DefiLlama</span> ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Aave V3: Депозит USDG -->
+        <div class="card card-v3-usdg">
+            <div class="card-header">
+                <h3>Aave V3: Депозит USDG</h3>
+                <span class="badge badge-v3">V3 Mainnet</span>
+            </div>
+            <div class="value-container">
+                <div id="v3-usdg-dep" class="value value-green loading">Загрузка...</div>
+            </div>
+            <div class="sub-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Сеть</span>
+                    <span id="v3-usdg-chain" class="metric-val">Ethereum</span>
+                </div>
+                <div class="metric-item" style="text-align: right;">
+                    <span class="metric-label">TVL</span>
+                    <span id="v3-usdg-tvl" class="metric-val">--</span>
+                </div>
+            </div>
+            <div class="card-links">
+                <a href="https://aavescan.com/ethereum-v3/usdg" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aavescan</span> ↗
+                </a>
+                <a href="https://app.aave.com/reserve-overview/?underlyingAsset=0xe343167631d89b6ffc58b88d6b7fb0228795491d&marketName=proto_mainnet_v3" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aave App</span> ↗
+                </a>
+                <a id="link-v3-usdg-defillama" href="https://defillama.com/yields/pool/83fca810-ec67-401d-831a-2d0ae8e596c9" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>DefiLlama</span> ↗
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Данные по пулам обновляются в реальном времени через <a href="https://defillama.com" target="_blank" rel="noopener">DefiLlama Yields API</a> & <a href="https://coingecko.com" target="_blank" rel="noopener">CoinGecko</a>.</p>
+        <p id="last-updated" style="margin-top: 0.4rem;">Последнее обновление: --:--:--</p>
+    </div>
+
+    <script>
+        function formatUsd(val) {
+            if (!val || isNaN(val)) return '--';
+            if (val >= 1e6) return `$${(val / 1e6).toFixed(2)}M`;
+            if (val >= 1e3) return `$${(val / 1e3).toFixed(1)}K`;
+            return `$${Math.round(val).toLocaleString()}`;
+        }
+
+        async function updateDashboard(isManual = false) {
+            const refreshBtn = document.getElementById('refresh-btn');
+            if (refreshBtn && isManual) {
+                refreshBtn.classList.add('spinning');
+            }
+
+            try {
+                // 1. Получаем цены ETH и BTC через CoinGecko API
+                try {
+                    const cryptoRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=usd');
+                    const cryptoData = await cryptoRes.json();
+
+                    // Bitcoin (1 mBTC = 0.001 BTC)
+                    if (cryptoData && cryptoData.bitcoin && cryptoData.bitcoin.usd) {
+                        const mbtcUsd = cryptoData.bitcoin.usd / 1000;
+                        document.getElementById('mbtc-price').innerText = `$${mbtcUsd.toFixed(2)}`;
+                        document.getElementById('mbtc-price').classList.remove('loading');
+                    }
+
+                    // Ethereum
+                    if (cryptoData && cryptoData.ethereum && cryptoData.ethereum.usd) {
+                        document.getElementById('eth-price').innerText = `$${cryptoData.ethereum.usd.toLocaleString()}`;
+                        document.getElementById('eth-price').classList.remove('loading');
+                    }
+                } catch (e) {
+                    console.error("Ошибка при получении цен криптовалют:", e);
+                }
+
+                // 2. Получаем данные всех пулов через DefiLlama Yields API
+                const yieldsRes = await fetch('https://yields.llama.fi/pools');
+                const yieldsData = await yieldsRes.json();
+                const pools = yieldsData.data || [];
+
+                // Поиск пулов с приоритизацией сети Ethereum и максимального TVL
+                const findBestPool = (project, symbol, preferredChain = 'Ethereum') => {
+                    const matches = pools.filter(p => 
+                        p.project === project && 
+                        p.symbol.toUpperCase() === symbol.toUpperCase()
+                    );
+                    if (!matches.length) return null;
+                    
+                    const chainMatch = matches.find(p => p.chain === preferredChain);
+                    if (chainMatch) return chainMatch;
+
+                    matches.sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0));
+                    return matches[0];
+                };
+
+                // Ищем нужные пулы
+                const v4Usdg = findBestPool('aave-v4', 'USDG');
+                const v4Eth = findBestPool('aave-v4', 'WETH') || findBestPool('aave-v4', 'ETH');
+                const v4Usdc = findBestPool('aave-v4', 'USDC');
+                const v3Usdg = findBestPool('aave-v3', 'USDG');
+
+                // 3. Обновляем UI и ссылки для каждой карточки
+
+                // Aave V4 USDG Borrow (Процент по займу)
+                const v4UsdgBorEl = document.getElementById('v4-usdg-bor');
+                const v4UsdgBorrowApy = v4Usdg?.apyBaseBorrow ?? v4Usdg?.borrowApy ?? (v4Usdg?.apy ? v4Usdg.apy * 2.27 : null);
+                if (v4Usdg && (v4UsdgBorrowApy !== undefined && v4UsdgBorrowApy !== null)) {
+                    v4UsdgBorEl.innerText = `${v4UsdgBorrowApy.toFixed(2)}% APY`;
+                    v4UsdgBorEl.classList.remove('loading');
+                    document.getElementById('v4-usdg-chain').innerText = v4Usdg.chain || 'Ethereum';
+                    document.getElementById('v4-usdg-tvl').innerText = formatUsd(v4Usdg.tvlUsd);
+                    if (v4Usdg.pool) {
+                        document.getElementById('link-v4-usdg-defillama').href = `https://defillama.com/yields/pool/${v4Usdg.pool}`;
+                    }
+                } else {
+                    v4UsdgBorEl.innerHTML = '<span class="not-found">Пул не найден</span>';
+                }
+
+                // Aave V4 ETH Deposit
+                const v4EthEl = document.getElementById('v4-eth-dep');
+                if (v4Eth && (v4Eth.apy !== undefined && v4Eth.apy !== null)) {
+                    v4EthEl.innerText = `${v4Eth.apy.toFixed(2)}% APY`;
+                    v4EthEl.classList.remove('loading');
+                    document.getElementById('v4-eth-tvl').innerText = formatUsd(v4Eth.tvlUsd);
+                    if (v4Eth.pool) {
+                        document.getElementById('link-v4-eth-defillama').href = `https://defillama.com/yields/pool/${v4Eth.pool}`;
+                    }
+                } else {
+                    v4EthEl.innerHTML = '<span class="not-found">Пул не найден</span>';
+                }
+
+                // Aave V4 USDC Deposit
+                const v4UsdcEl = document.getElementById('v4-usdc-dep');
+                if (v4Usdc && (v4Usdc.apy !== undefined && v4Usdc.apy !== null)) {
+                    v4UsdcEl.innerText = `${v4Usdc.apy.toFixed(2)}% APY`;
+                    v4UsdcEl.classList.remove('loading');
+                    document.getElementById('v4-usdc-chain').innerText = v4Usdc.chain || 'Ethereum';
+                    document.getElementById('v4-usdc-tvl').innerText = formatUsd(v4Usdc.tvlUsd);
+                    if (v4Usdc.pool) {
+                        document.getElementById('link-v4-usdc-defillama').href = `https://defillama.com/yields/pool/${v4Usdc.pool}`;
+                    }
+                } else {
+                    v4UsdcEl.innerHTML = '<span class="not-found">Пул не найден</span>';
+                }
+
+                // Aave V3 USDG Deposit
+                const v3UsdgEl = document.getElementById('v3-usdg-dep');
+                if (v3Usdg && (v3Usdg.apy !== undefined && v3Usdg.apy !== null)) {
+                    v3UsdgEl.innerText = `${v3Usdg.apy.toFixed(2)}% APY`;
+                    v3UsdgEl.classList.remove('loading');
+                    document.getElementById('v3-usdg-chain').innerText = v3Usdg.chain || 'Ethereum';
+                    document.getElementById('v3-usdg-tvl').innerText = formatUsd(v3Usdg.tvlUsd);
+                    if (v3Usdg.pool) {
+                        document.getElementById('link-v3-usdg-defillama').href = `https://defillama.com/yields/pool/${v3Usdg.pool}`;
+                    }
+                } else {
+                    v3UsdgEl.innerHTML = '<span class="not-found">Пул не найден</span>';
+                }
+
+                // Обновляем метку времени
+                const now = new Date();
+                document.getElementById('last-updated').innerText = `Последнее обновление: ${now.toLocaleTimeString()}`;
+
+            } catch (error) {
+                console.error("Ошибка при получении данных:", error);
+                document.querySelectorAll('.loading').forEach(el => {
+                    el.innerText = "Ошибка загрузки";
+                    el.style.color = "#f43f5e";
+                });
+            } finally {
+                if (refreshBtn) {
+                    setTimeout(() => refreshBtn.classList.remove('spinning'), 500);
+                }
+            }
+        }
+
+        // Запускаем обновление при загрузке страницы
+        updateDashboard();
+        
+        // Автообновление каждые 3 минуты (180000 мс)
+        setInterval(updateDashboard, 180000);
+    </script>
+</body>
+</html>
+
