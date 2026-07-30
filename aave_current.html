@@ -62,6 +62,7 @@
             font-weight: 800;
             background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.02em;
             margin-bottom: 0.5rem;
@@ -438,7 +439,7 @@
         <div class="card card-v4-usdg">
             <div class="card-header">
                 <h3>Aave V4: Займ USDG</h3>
-                <span class="badge badge-v4">V4 Global Hub</span>
+                <span class="badge badge-v4">V4 Core Hub</span>
             </div>
             <div class="value-container">
                 <div id="v4-usdg-bor" class="value value-borrow loading">Загрузка...</div>
@@ -489,8 +490,8 @@
                 <a href="https://aavescan.com/ethereum-v4-core/weth" target="_blank" rel="noopener noreferrer" class="link-btn">
                     <span>Aavescan</span> ↗
                 </a>
-                <a href="https://app.aave.com/reserve-overview/?underlyingAsset=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&marketName=proto_mainnet_v3" target="_blank" rel="noopener noreferrer" class="link-btn">
-                    <span>Aave App</span> ↗
+                <a href="https://pro.aave.com/explore/reserve/MTo6MHg5NGU3QTVkQ2JFODE2ZTQ5OGI4OWFCNzUyNjYxOTA0RTJGNTZjNDg1Ojow" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aave Pro</span> ↗
                 </a>
                 <a id="link-v4-eth-defillama" href="https://defillama.com/yields/pool/e25b2934-8c6c-468a-b680-d6cba811b85f" target="_blank" rel="noopener noreferrer" class="link-btn">
                     <span>DefiLlama</span> ↗
@@ -502,15 +503,15 @@
         <div class="card card-v4-usdc">
             <div class="card-header">
                 <h3>Aave V4: Депозит USDC</h3>
-                <span class="badge badge-v4">V4 Core Hub</span>
+                <span class="badge badge-v4">V4 Forex Market</span>
             </div>
             <div class="value-container">
                 <div id="v4-usdc-dep" class="value value-green loading">Загрузка...</div>
             </div>
             <div class="sub-metrics">
                 <div class="metric-item">
-                    <span class="metric-label">Сеть</span>
-                    <span id="v4-usdc-chain" class="metric-val">Ethereum</span>
+                    <span class="metric-label">Сеть / Маркет</span>
+                    <span id="v4-usdc-chain" class="metric-val">Forex (Ethereum)</span>
                 </div>
                 <div class="metric-item" style="text-align: right;">
                     <span class="metric-label">TVL</span>
@@ -518,13 +519,13 @@
                 </div>
             </div>
             <div class="card-links">
-                <a href="https://aavescan.com/ethereum-v4-core/usdc" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <a href="https://aavescan.com/ethereum-v4-forex/usdc" target="_blank" rel="noopener noreferrer" class="link-btn">
                     <span>Aavescan</span> ↗
                 </a>
-                <a href="https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3" target="_blank" rel="noopener noreferrer" class="link-btn">
-                    <span>Aave App</span> ↗
+                <a href="https://pro.aave.com/explore/reserve/MTo6MHhEOEI5MzYzNWI4QzZkMGZGOThDYkU5MGI1OTg4RTNGMmQxQ2Q5ZGExOjox" target="_blank" rel="noopener noreferrer" class="link-btn">
+                    <span>Aave Pro</span> ↗
                 </a>
-                <a id="link-v4-usdc-defillama" href="https://defillama.com/yields/pool/4ac1a968-68ab-4da8-87e3-8f1e15e3dae2" target="_blank" rel="noopener noreferrer" class="link-btn">
+                <a id="link-v4-usdc-defillama" href="https://defillama.com/yields/pool/38f1474f-bb56-46ff-b2c6-bc07539a1f2b" target="_blank" rel="noopener noreferrer" class="link-btn">
                     <span>DefiLlama</span> ↗
                 </a>
             </div>
@@ -609,26 +610,38 @@
                 const yieldsData = await yieldsRes.json();
                 const pools = yieldsData.data || [];
 
-                // Поиск пулов с приоритизацией сети Ethereum и максимального TVL
-                const findBestPool = (project, symbol, preferredChain = 'Ethereum') => {
+                // Поиск пулов с приоритизацией сети Ethereum, нужного хаба/маркета и максимального TVL
+                const findBestPool = (project, symbol, preferredChain = 'Ethereum', preferredMeta = null) => {
                     const matches = pools.filter(p => 
                         p.project === project && 
                         p.symbol.toUpperCase() === symbol.toUpperCase()
                     );
                     if (!matches.length) return null;
                     
-                    const chainMatch = matches.find(p => p.chain === preferredChain);
-                    if (chainMatch) return chainMatch;
+                    if (preferredMeta) {
+                        const metas = Array.isArray(preferredMeta) ? preferredMeta : [preferredMeta];
+                        const metaMatch = matches.find(p => 
+                            p.chain === preferredChain && 
+                            p.poolMeta && metas.some(m => p.poolMeta.toLowerCase().includes(m.toLowerCase()))
+                        );
+                        if (metaMatch) return metaMatch;
+                    }
+
+                    const chainMatches = matches.filter(p => p.chain === preferredChain);
+                    if (chainMatches.length) {
+                        chainMatches.sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0));
+                        return chainMatches[0];
+                    }
 
                     matches.sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0));
                     return matches[0];
                 };
 
                 // Ищем нужные пулы
-                const v4Usdg = findBestPool('aave-v4', 'USDG');
-                const v4Eth = findBestPool('aave-v4', 'WETH') || findBestPool('aave-v4', 'ETH');
-                const v4Usdc = findBestPool('aave-v4', 'USDC');
-                const v3Usdg = findBestPool('aave-v3', 'USDG');
+                const v4Usdg = findBestPool('aave-v4', 'USDG', 'Ethereum', 'Core');
+                const v4Eth = findBestPool('aave-v4', 'WETH', 'Ethereum', 'Core') || findBestPool('aave-v4', 'ETH', 'Ethereum', 'Core');
+                const v4Usdc = findBestPool('aave-v4', 'USDC', 'Ethereum', ['Forex', 'Prime']);
+                const v3Usdg = findBestPool('aave-v3', 'USDG', 'Ethereum');
 
                 // 3. Обновляем UI и ссылки для каждой карточки
 
@@ -665,7 +678,7 @@
                 if (v4Usdc && (v4Usdc.apy !== undefined && v4Usdc.apy !== null)) {
                     v4UsdcEl.innerText = `${v4Usdc.apy.toFixed(2)}% APY`;
                     v4UsdcEl.classList.remove('loading');
-                    document.getElementById('v4-usdc-chain').innerText = v4Usdc.chain || 'Ethereum';
+                    document.getElementById('v4-usdc-chain').innerText = v4Usdc.poolMeta ? `${v4Usdc.poolMeta} (Ethereum)` : (v4Usdc.chain || 'Ethereum');
                     document.getElementById('v4-usdc-tvl').innerText = formatUsd(v4Usdc.tvlUsd);
                     if (v4Usdc.pool) {
                         document.getElementById('link-v4-usdc-defillama').href = `https://defillama.com/yields/pool/${v4Usdc.pool}`;
