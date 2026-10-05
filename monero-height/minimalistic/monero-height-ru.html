@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск блока Monero</title>
+    <style>
+        body { 
+            background: #1e1e2e; color: #cdd6f4; font-family: system-ui, sans-serif; 
+            padding: 2rem; max-width: 700px; margin: 0 auto; 
+        }
+        input { 
+            padding: 10px; font-size: 16px; background: #313244; color: #cdd6f4; 
+            border: 1px solid #45475a; border-radius: 4px; color-scheme: dark; outline: none;
+        }
+        button { 
+            padding: 10px 15px; font-size: 16px; background: #f38ba8; color: #11111b; 
+            border: none; border-radius: 4px; cursor: pointer; font-weight: bold; 
+        }
+        button:hover { background: #eba0ac; }
+        pre { 
+            background: #181825; padding: 15px; border-radius: 6px; overflow-x: auto; 
+            font-size: 14px; border: 1px solid #313244; line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <h2>Бинарный поиск блока XMR по дате</h2>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <input type="datetime-local" id="dateInput">
+        <button onclick="findBlock()">Найти блок</button>
+    </div>
+    <pre id="output">Готов к работе. Выбери дату (в твоем локальном времени) и нажми кнопку.</pre>
+
+    <script>
+        async function fetchApi(path) {
+            const res = await fetch(`https://xmrchain.net/api${path}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        }
+
+        async function findBlock() {
+            const out = document.getElementById('output');
+            const dateVal = document.getElementById('dateInput').value;
+            if (!dateVal) return out.textContent = "Сначала выбери дату!";
+
+            // Переводим локальную дату из инпута в UNIX timestamp
+            const targetTs = Math.floor(new Date(dateVal).getTime() / 1000);
+            out.textContent = `Ищу блок для UNIX-времени: ${targetTs}...\n`;
+
+            try {
+                out.textContent += `Получаю текущую высоту сети...\n`;
+                const netInfo = await fetchApi('/networkinfo');
+                
+                let low = 1;
+                let high = netInfo.data.height;
+                let bestHeight = 1;
+                let bestDiff = Infinity;
+                let step = 1;
+
+                out.textContent += `Текущая высота: ${high}. Начинаю бинарный поиск...\n\n`;
+
+                while (low <= high) {
+                    let mid = Math.floor((low + high) / 2);
+                    out.textContent += `[Шаг ${step++}] Проверка блока ${mid}... `;
+                    
+                    const blockInfo = await fetchApi(`/block/${mid}`);
+                    const midTs = blockInfo.data.timestamp;
+                    const diff = Math.abs(midTs - targetTs);
+
+                    out.textContent += `(разница ${Math.round(diff / 60)} мин)\n`;
+
+                    if (diff < bestDiff) {
+                        bestDiff = diff;
+                        bestHeight = mid;
+                    }
+
+                    if (midTs === targetTs) break;
+                    else if (midTs < targetTs) low = mid + 1;
+                    else high = mid - 1;
+                }
+
+                out.textContent += `\nЗапрашиваю данные найденного блока ${bestHeight}...\n`;
+                const finalBlock = await fetchApi(`/block/${bestHeight}`);
+                
+                const dateStr = new Date(finalBlock.data.timestamp * 1000)
+                    .toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+                
+                out.textContent += `\n=================================\n🎯 Ближайший блок найден!\n`;
+                out.textContent += `Высота: ${bestHeight}\n`;
+                out.textContent += `Хэш:    ${finalBlock.data.hash}\n`;
+                out.textContent += `Время:  ${dateStr}\n`;
+                out.textContent += `Погрешность: ~${Math.round(bestDiff / 60)} мин.\n`;
+
+            } catch (err) {
+                out.textContent += `\n❌ Ошибка: ${err.message}. Возможно, xmrchain.net недоступен.`;
+            }
+        }
+    </script>
+</body>
+</html>

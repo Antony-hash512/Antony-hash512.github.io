@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="system" data-color-mode="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="Быстрый поиск высоты блока Monero (XMR) по дате и времени с помощью бинарного поиска через xmrchain.net. / Fast Monero block height finder by date using binary search.">
+    <title>Поиск блока Monero по дате — XMR Block Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            
+            /* Monero brand palette */
+            --xmr-orange: #f26822;
+            --xmr-orange-hover: #ff7836;
+            --xmr-orange-light: #ff9158;
+            --xmr-orange-glow: rgba(242, 104, 34, 0.28);
+            --xmr-orange-subtle: rgba(242, 104, 34, 0.12);
+            --xmr-gray: #4d4d4d;
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            --transition-speed: 0.2s;
+        }
+
+        /* Dark Theme Tokens */
+        [data-color-mode="dark"] {
+            --bg-body: #0d0f15;
+            --bg-card: #151822;
+            --bg-card-secondary: #1a1e2b;
+            --bg-card-hover: #1e2333;
+            --bg-input: #11131c;
+            --bg-terminal: #090a0e;
+            --bg-tag: #222738;
+            
+            --text-primary: #f3f4f8;
+            --text-secondary: #9ea4b6;
+            --text-muted: #676e82;
+            
+            --border-main: #24293a;
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-focus: var(--xmr-orange);
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.04);
+            --shadow-glow: 0 0 24px rgba(242, 104, 34, 0.25);
+            
+            --success-color: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.12);
+            --error-color: #f43f5e;
+            --error-bg: rgba(244, 63, 94, 0.12);
+            --warning-color: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            
+            --term-log-step: #38bdf8;
+            --term-log-diff: #a78bfa;
+            --term-log-left: #fb7185;
+            --term-log-right: #4ade80;
+        }
+
+        /* Light Theme Tokens */
+        [data-color-mode="light"] {
+            --bg-body: #f4f6fa;
+            --bg-card: #ffffff;
+            --bg-card-secondary: #f8fafc;
+            --bg-card-hover: #f1f5f9;
+            --bg-input: #ffffff;
+            --bg-terminal: #11131a; /* Dark terminal for code readability */
+            --bg-tag: #e2e8f0;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #8492a6;
+            
+            --border-main: #e2e8f0;
+            --border-subtle: rgba(0, 0, 0, 0.06);
+            --border-focus: var(--xmr-orange);
+            
+            --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 12px 30px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 24px rgba(242, 104, 34, 0.2);
+            
+            --success-color: #059669;
+            --success-bg: rgba(5, 150, 105, 0.1);
+            --error-color: #e11d48;
+            --error-bg: rgba(225, 29, 72, 0.1);
+            --warning-color: #d97706;
+            --warning-bg: rgba(217, 119, 6, 0.1);
+            
+            --term-log-step: #38bdf8;
+            --term-log-diff: #c084fc;
+            --term-log-left: #fb7185;
+            --term-log-right: #4ade80;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 15px;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 1.5rem 1rem 3rem;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Top Header Navigation */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(0 4px 10px var(--xmr-orange-glow));
+            flex-shrink: 0;
+        }
+
+        .brand-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Header Switchers Bar */
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .segmented-group {
+            display: inline-flex;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-full);
+            padding: 3px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .segment-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            padding: 5px 11px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .segment-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .segment-btn.active {
+            background: var(--xmr-orange);
+            color: #ffffff;
+            box-shadow: 0 2px 8px var(--xmr-orange-glow);
+        }
+
+        .segment-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2.2;
+            flex-shrink: 0;
+        }
+
+        /* Main Hero Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-md);
+            transition: border-color var(--transition-speed), background-color var(--transition-speed);
+        }
+
+        .hero-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.25rem 0.65rem;
+            background: var(--xmr-orange-subtle);
+            color: var(--xmr-orange);
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: var(--radius-full);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(242, 104, 34, 0.2);
+        }
+
+        .hero-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .hero-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Input Section */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .input-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .input-sublabel {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .datetime-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-main);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .datetime-input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--xmr-orange-glow);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.4rem;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            user-select: none;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--xmr-orange), #d9531e);
+            color: #ffffff;
+            box-shadow: 0 4px 14px var(--xmr-orange-glow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--xmr-orange-hover), #e65c22);
+            box-shadow: 0 6px 20px rgba(242, 104, 34, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-main);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-card-hover);
+            border-color: var(--text-muted);
+        }
+
+        .btn-danger {
+            background: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid rgba(244, 63, 94, 0.25);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: var(--error-color);
+            color: #ffffff;
+        }
+
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* Preset Chips */
+        .presets-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .presets-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-right: 0.25rem;
+        }
+
+        .preset-chip {
+            padding: 0.35rem 0.75rem;
+            background: var(--bg-card-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .preset-chip:hover {
+            color: var(--text-primary);
+            border-color: var(--border-main);
+            background: var(--bg-card-hover);
+        }
+
+        /* Progress Bar & Status */
+        .progress-box {
+            display: none;
+            flex-direction: column;
+            gap: 0.6rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-card-secondary);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-md);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .progress-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--xmr-orange-glow);
+            border-top-color: var(--xmr-orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-step-text {
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar-track {
+            height: 6px;
+            background: var(--border-main);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--xmr-orange), #ff9158);
+            border-radius: var(--radius-full);
+            transition: width 0.25s ease;
+        }
+
+        /* Result Card */
+        .result-card {
+            display: none;
+            border-color: var(--xmr-orange);
+            background: linear-gradient(180deg, var(--xmr-orange-subtle) 0%, var(--bg-card) 90px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--xmr-orange), #ff9158);
+        }
+
+        .result-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            background: var(--success-bg);
+            color: var(--success-color);
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-item {
+            background: var(--bg-card-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .result-item-full {
+            grid-column: 1 / -1;
+        }
+
+        .result-item-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .result-item-val {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            word-break: normal;
+            overflow-wrap: break-word;
+        }
+
+        .result-height-highlight {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--xmr-orange);
+            font-family: var(--font-mono);
+            letter-spacing: -0.02em;
+        }
+
+        .result-hash-code {
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            background: var(--bg-body);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .result-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .copy-feedback {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--success-color);
+            margin-left: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+        }
+
+        /* Console / Terminal Log */
+        .terminal-card {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .terminal-title-area {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .terminal-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #94a3b8;
+            font-family: var(--font-mono);
+        }
+
+        .terminal-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            padding: 0.3rem 0.65rem;
+            font-size: 0.75rem;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .terminal-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+
+        pre#output {
+            padding: 1.25rem;
+            color: #e2e8f0;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            max-height: 360px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Scrollbar */
+        pre#output::-webkit-scrollbar {
+            width: 8px;
+        }
+        pre#output::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        pre#output::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+        pre#output::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Informational Card */
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .info-icon {
+            color: var(--xmr-orange);
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .info-content h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+        }
+
+        .info-content p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Versions Bar under Header */
+        .versions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: -0.5rem;
+            padding: 0 0.25rem;
+        }
+
+        .versions-bar a {
+            color: var(--xmr-orange);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 500;
+            transition: color var(--transition-speed);
+        }
+
+        .versions-bar a:hover {
+            color: var(--xmr-orange-hover);
+        }
+
+        .versions-bar .sep {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        /* Footer */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+
+        footer a:hover {
+            color: var(--xmr-orange);
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem 0.75rem 2rem;
+            }
+            .hero-title {
+                font-size: 1.3rem;
+            }
+            .card {
+                padding: 1.25rem;
+            }
+            .input-row {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+            .result-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .result-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <a href="#" class="brand" aria-label="Monero Height Finder">
+                <!-- Official Monero SVG Logo -->
+                <svg class="brand-logo" viewBox="0 0 3756.09 3756.49" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4128,2249.81C4128,3287,3287.26,4127.86,2250,4127.86S372,3287,372,2249.81,1212.76,371.75,2250,371.75,4128,1212.54,4128,2249.81Z" transform="translate(-371.96 -371.75)" fill="#fff"/>
+                    <path d="M2250,371.75c-1036.89,0-1879.12,842.06-1877.8,1878,0.26,207.26,33.31,406.63,95.34,593.12h561.88V1263L2250,2483.57,3470.52,1263v1579.9h562c62.12-186.48,95-385.85,95.37-593.12C4129.66,1212.76,3287,372,2250,372Z" transform="translate(-371.96 -371.75)" fill="#f26822"/>
+                    <path d="M1969.3,2764.17l-532.67-532.7v994.14H1029.38l-384.29.07c329.63,540.8,925.35,902.56,1604.91,902.56S3525.31,3766.4,3855,3225.6H3063.25V2231.47l-532.7,532.7-280.61,280.61-280.62-280.61h0Z" transform="translate(-371.96 -371.75)" fill="#4d4d4d"/>
+                </svg>
+                <div class="brand-text">
+                    <h1>Monero Height</h1>
+                    <span data-i18n="brandSubtitle">Поиск высоты блока XMR</span>
+                </div>
+            </a>
+
+            <div class="controls-bar">
+                <!-- Theme Switcher (Light / Dark / System) -->
+                <div class="segmented-group" id="themeSwitcher" role="group" aria-label="Переключатель темы оформления">
+                    <button type="button" class="segment-btn" data-theme-val="light" id="themeBtnLight" title="Светлая тема" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span data-i18n="themeLight">Светлая</span>
+                    </button>
+                    <button type="button" class="segment-btn" data-theme-val="dark" id="themeBtnDark" title="Тёмная тема" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span data-i18n="themeDark">Тёмная</span>
+                    </button>
+                    <button type="button" class="segment-btn" data-theme-val="system" id="themeBtnSystem" title="Системная тема" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span data-i18n="themeSystem">Системная</span>
+                    </button>
+                </div>
+
+                <!-- Language Switcher (RU / EN, strictly without emoji flags) -->
+                <div class="segmented-group" id="langSwitcher" role="group" aria-label="Язык интерфейса">
+                    <button type="button" class="segment-btn" data-lang="ru" id="langBtnRu" aria-pressed="true">RU</button>
+                    <button type="button" class="segment-btn" data-lang="en" id="langBtnEn" aria-pressed="false">EN</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Minimalistic versions link bar (under header) -->
+        <div class="versions-bar">
+            <span data-i18n="footerMinimalisticTitle">Минималистичные версии:</span>
+            <a href="minimalistic/monero-height-ru.html" data-i18n="versionRu">Русская версия</a>
+            <span class="sep">•</span>
+            <a href="minimalistic/monero-height-en.html" data-i18n="versionEn">English version</a>
+        </div>
+
+        <!-- Main Card: Input & Controls -->
+        <main class="card">
+            <div class="hero-header">
+                <div class="hero-badge">
+                    <span data-i18n="heroBadge">⚡ Быстрый бинарный поиск в блокчейне</span>
+                </div>
+                <h2 class="hero-title" data-i18n="title">Бинарный поиск блока Monero по дате</h2>
+                <p class="hero-desc" data-i18n="subtitle">Быстрое определение высоты блока (restore height) для любой даты за ~22 запроса к блокчейну через xmrchain.net.</p>
+            </div>
+
+            <div class="form-section">
+                <div class="input-group">
+                    <div class="input-header">
+                        <label for="dateInput" class="input-label" data-i18n="inputLabel">Выберите дату и время (формат mm-dd-yyyy)</label>
+                        <span class="input-sublabel" data-i18n="inputSublabel">В вашем локальном часовом поясе</span>
+                    </div>
+
+                    <div class="input-row">
+                        <input type="datetime-local" id="dateInput" class="datetime-input" aria-label="Дата и время поиска">
+                        <button type="button" id="btnSearch" class="btn btn-primary" onclick="findBlock()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <span data-i18n="btnSearch">Найти блок</span>
+                        </button>
+                        <button type="button" id="btnStop" class="btn btn-danger" style="display: none;" onclick="stopSearch()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="6" y="6" width="12" height="12" rx="1"></rect>
+                            </svg>
+                            <span data-i18n="btnStop">Остановить</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Presets -->
+                <div class="presets-bar">
+                    <span class="presets-title" data-i18n="presetsTitle">Быстрый выбор:</span>
+                    <button type="button" class="preset-chip" onclick="applyPreset('1d')" data-i18n="presetYesterday">24 часа назад</button>
+                    <button type="button" class="preset-chip" onclick="applyPreset('7d')" data-i18n="presetWeek">7 дней назад</button>
+                    <button type="button" class="preset-chip" onclick="applyPreset('30d')" data-i18n="presetMonth">30 дней назад</button>
+                    <button type="button" class="preset-chip" onclick="applyPreset('1y')" data-i18n="presetYear">1 год назад</button>
+                    <button type="button" class="preset-chip" onclick="applyPreset('5y')" data-i18n="preset5Years">5 лет назад</button>
+                    <button type="button" class="preset-chip" onclick="applyPreset('genesis')" data-i18n="presetGenesis">Генезис (2014)</button>
+                </div>
+
+                <!-- Progress box during search -->
+                <div class="progress-box" id="progressBox">
+                    <div class="progress-header">
+                        <div class="progress-title">
+                            <div class="spinner"></div>
+                            <span id="progressStatusText" data-i18n="statusSearching">Выполняется бинарный поиск...</span>
+                        </div>
+                        <span class="progress-step-text" id="progressStepText">Шаг 1 из ~22</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Result Card -->
+        <section class="card result-card" id="resultCard" aria-live="polite">
+            <div class="result-top">
+                <div class="result-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span data-i18n="resultTitle">Ближайший блок найден</span>
+                </div>
+                <div class="copy-feedback" id="copyFeedback" data-i18n="copied">Скопировано!</div>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-item-label" data-i18n="labelHeight">Высота блока</span>
+                    <span class="result-height-highlight" id="resHeight">—</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-item-label" data-i18n="labelDiff">Разница во времени</span>
+                    <span class="result-item-val" id="resDiff">—</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-item-label" data-i18n="labelTimeLocal">Локальное время</span>
+                    <span class="result-item-val" id="resTimeLocal">—</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-item-label" data-i18n="labelTimeUtc">Время по UTC</span>
+                    <span class="result-item-val" id="resTimeUtc">—</span>
+                </div>
+                <div class="result-item result-item-full">
+                    <span class="result-item-label" data-i18n="labelHash">Хэш блока</span>
+                    <div class="result-hash-code" id="resHash">—</div>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button type="button" class="btn btn-primary" onclick="copyHeight()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span data-i18n="btnCopyHeight">Копировать высоту</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="copyHash()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span data-i18n="btnCopyHash">Копировать хэш</span>
+                </button>
+                <a href="#" id="explorerLink" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    <span data-i18n="btnExplorer">Открыть в xmrchain.net</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Log Console -->
+        <section class="terminal-card">
+            <div class="terminal-header">
+                <div class="terminal-title-area">
+                    <div class="terminal-dots">
+                        <span class="terminal-dot dot-red"></span>
+                        <span class="terminal-dot dot-yellow"></span>
+                        <span class="terminal-dot dot-green"></span>
+                    </div>
+                    <span class="terminal-title" data-i18n="logTitle">Журнал поиска</span>
+                </div>
+                <div class="terminal-actions">
+                    <button type="button" class="terminal-btn" onclick="copyLog()" data-i18n="btnCopyLog">Копировать лог</button>
+                    <button type="button" class="terminal-btn" onclick="clearLog()" data-i18n="btnClearLog">Очистить</button>
+                </div>
+            </div>
+            <pre id="output" role="region" aria-label="Консоль журнала поиска">Готов к работе. Выберите дату (в вашем локальном времени) и нажмите кнопку «Найти блок».</pre>
+        </section>
+
+        <!-- Information Callout -->
+        <aside class="info-card">
+            <div class="info-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+            </div>
+            <div class="info-content">
+                <h3 data-i18n="whyTitle">Зачем это нужно?</h3>
+                <p data-i18n="whyDesc">При восстановлении кошелька Monero (CLI, GUI, Cake Wallet, Feather) указание точной высоты блока позволяет начать сканирование с нужного момента, сокращая время синхронизации с часов до минут.</p>
+            </div>
+        </aside>
+
+        <!-- Footer -->
+        <footer>
+            <div data-i18n="footerPrivacy">100% клиентское приложение. Работает без сервера, запросы отправляются напрямую к открытому API xmrchain.net.</div>
+            <div>
+                <a href="https://github.com/Antony-hash512/monero-height#russian" id="githubLink" target="_blank" rel="noopener noreferrer">GitHub</a> • 
+                <span data-i18n="footerLicense">Лицензия MIT</span> • Monero Height Finder
+            </div>
+        </footer>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // Internationalization dictionary
+        const I18N = {
+            ru: {
+                pageTitle: "Поиск блока Monero по дате — XMR Block Finder",
+                brandSubtitle: "Поиск высоты блока XMR",
+                heroBadge: "⚡ Быстрый бинарный поиск в блокчейне",
+                title: "Бинарный поиск блока Monero по дате",
+                subtitle: "Быстрое определение высоты блока (restore height) для любой даты за ~22 запроса к блокчейну через xmrchain.net.",
+                themeLight: "Светлая",
+                themeDark: "Тёмная",
+                themeSystem: "Системная",
+                inputLabel: "Выберите дату и время (формат mm-dd-yyyy)",
+                inputSublabel: "В вашем локальном часовом поясе",
+                presetsTitle: "Быстрый выбор:",
+                presetYesterday: "24 часа назад",
+                presetWeek: "7 дней назад",
+                presetMonth: "30 дней назад",
+                presetYear: "1 год назад",
+                preset5Years: "5 лет назад",
+                presetGenesis: "Генезис (2014)",
+                btnSearch: "Найти блок",
+                btnSearching: "Идёт поиск...",
+                btnStop: "Остановить",
+                btnReset: "Сбросить",
+                progressStep: "Шаг {step} из ~{total}",
+                statusSearching: "Выполняется бинарный поиск...",
+                statusCompleted: "Поиск успешно завершён",
+                statusCancelled: "Поиск остановлен пользователем",
+                statusError: "Произошла ошибка при поиске",
+                resultTitle: "Ближайший блок найден",
+                labelHeight: "Высота блока",
+                labelHash: "Хэш блока",
+                labelTimeLocal: "Локальное время",
+                labelTimeUtc: "Время по UTC",
+                labelDiff: "Разница во времени",
+                btnExplorer: "Открыть в xmrchain.net",
+                btnCopyHeight: "Копировать высоту",
+                btnCopyHash: "Копировать хэш",
+                copied: "Скопировано!",
+                logTitle: "Журнал поиска",
+                btnClearLog: "Очистить",
+                btnCopyLog: "Копировать лог",
+                logInitial: "Готов к работе. Выберите дату (в вашем локальном времени) и нажмите кнопку «Найти блок».",
+                logTargetTs: "🎯 Целевое время: {local} (UNIX: {ts})\n",
+                logFetchingNet: "⏳ Запрашиваю текущее состояние сети Monero...\n",
+                logNetInfo: "✓ Текущая высота сети: {height}. Диапазон поиска: 1 … {height}\n\n",
+                logStep: "[Шаг {step}] Блок {mid} | {dateStr} | Разница: {diffStr}\n",
+                logBestBlockFetch: "\n⏳ Запрашиваю данные найденного блока {height}...\n",
+                logSuccessHeader: "\n=================================\n🎯 Ближайший блок найден!\nВысота:      {height}\nХэш:         {hash}\nВремя (UTC): {timeUtc}\nВремя (лок): {timeLocal}\nРазница:     {diffStr}\n=================================\n",
+                logCancelled: "\n⚠️ Поиск был отменён пользователем.\n",
+                errSelectDate: "⚠️ Сначала выберите дату и время!",
+                errDateGenesis: "❌ Выбранная дата раньше создания первого блока Monero (18 апреля 2014 г.). Первый блок датирован 18.04.2014 10:49:53 UTC.",
+                errDateFuture: "❌ Выбранная дата находится в будущем относительно последнего найденного блока сети.",
+                errNetwork: "❌ Ошибка: {msg}. Сервис xmrchain.net может быть временно недоступен.",
+                diffExact: "точное совпадение (0 сек.)",
+                diffSec: "{n} сек.",
+                diffMin: "{n} мин.",
+                diffHours: "{h} ч. {m} мин.",
+                diffDays: "{d} дн. {h} ч.",
+                whyTitle: "Зачем это нужно?",
+                whyDesc: "При восстановлении кошелька Monero (CLI, GUI, Cake Wallet, Feather) указание точной высоты блока позволяет начать сканирование с нужного момента, сокращая время синхронизации с часов до минут.",
+                footerPrivacy: "100% клиентское приложение. Работает без сервера, запросы отправляются напрямую к открытому API xmrchain.net.",
+                footerLicense: "Лицензия MIT",
+                footerMinimalisticTitle: "Минималистичные версии:",
+                versionRu: "Русская версия",
+                versionEn: "English version"
+            },
+            en: {
+                pageTitle: "Monero Block Finder by Date — XMR Block Finder",
+                brandSubtitle: "XMR Block Height Finder",
+                heroBadge: "⚡ Fast blockchain binary search",
+                title: "Binary Search Monero Block by Date",
+                subtitle: "Fast determination of Monero restore height for any date in ~22 blockchain queries via xmrchain.net.",
+                themeLight: "Light",
+                themeDark: "Dark",
+                themeSystem: "System",
+                inputLabel: "Select Date and Time (mm-dd-yyyy format)",
+                inputSublabel: "In your local timezone",
+                presetsTitle: "Quick presets:",
+                presetYesterday: "24 hours ago",
+                presetWeek: "7 days ago",
+                presetMonth: "30 days ago",
+                presetYear: "1 year ago",
+                preset5Years: "5 years ago",
+                presetGenesis: "Genesis (2014)",
+                btnSearch: "Find Block",
+                btnSearching: "Searching...",
+                btnStop: "Cancel",
+                btnReset: "Reset",
+                progressStep: "Step {step} of ~{total}",
+                statusSearching: "Running binary search...",
+                statusCompleted: "Search completed successfully",
+                statusCancelled: "Search cancelled by user",
+                statusError: "An error occurred during search",
+                resultTitle: "Nearest Block Found",
+                labelHeight: "Block Height",
+                labelHash: "Block Hash",
+                labelTimeLocal: "Local Time",
+                labelTimeUtc: "UTC Time",
+                labelDiff: "Time Difference",
+                btnExplorer: "Open in xmrchain.net",
+                btnCopyHeight: "Copy Height",
+                btnCopyHash: "Copy Hash",
+                copied: "Copied!",
+                logTitle: "Search Log",
+                btnClearLog: "Clear",
+                btnCopyLog: "Copy Log",
+                logInitial: "Ready. Select a date (in your local time) and click 'Find Block'.",
+                logTargetTs: "🎯 Target time: {local} (UNIX: {ts})\n",
+                logFetchingNet: "⏳ Fetching current Monero network state...\n",
+                logNetInfo: "✓ Current network height: {height}. Binary search range: 1 … {height}\n\n",
+                logStep: "[Step {step}] Block {mid} | {dateStr} | Diff: {diffStr}\n",
+                logBestBlockFetch: "\n⏳ Fetching detailed data for nearest block {height}...\n",
+                logSuccessHeader: "\n=================================\n🎯 Nearest block found!\nHeight:      {height}\nHash:        {hash}\nTime (UTC):  {timeUtc}\nTime (Local):{timeLocal}\nDiff:        {diffStr}\n=================================\n",
+                logCancelled: "\n⚠️ Search was cancelled by user.\n",
+                errSelectDate: "⚠️ Please select a date and time first!",
+                errDateGenesis: "❌ Selected date is before the Monero genesis block (April 18, 2014). Genesis block is dated 2014-04-18 10:49:53 UTC.",
+                errDateFuture: "❌ Selected date is in the future relative to the latest network block.",
+                errNetwork: "❌ Error: {msg}. xmrchain.net may be temporarily unreachable.",
+                diffExact: "exact match (0 sec)",
+                diffSec: "{n} sec",
+                diffMin: "{n} min",
+                diffHours: "{h} h {m} min",
+                diffDays: "{d} d {h} h",
+                whyTitle: "Why is this needed?",
+                whyDesc: "When restoring a Monero wallet (CLI, GUI, Cake Wallet, Feather), specifying the exact block height starts scanning from the right point, cutting synchronization time from hours to minutes.",
+                footerPrivacy: "100% client-side application. Runs without a backend, requests go directly to the public xmrchain.net API.",
+                footerLicense: "MIT License",
+                footerMinimalisticTitle: "Minimalistic versions:",
+                versionRu: "Russian version",
+                versionEn: "English version"
+            }
+        };
+
+        // Safe storage helpers (handles file:// restricted mode gracefully)
+        function safeGetItem(key, fallback = null) {
+            try {
+                const val = localStorage.getItem(key);
+                return val !== null ? val : fallback;
+            } catch (e) {
+                return fallback;
+            }
+        }
+
+        function safeSetItem(key, value) {
+            try {
+                localStorage.setItem(key, value);
+            } catch (e) {
+                // Storage may be disabled in restricted file:// or private browsing
+            }
+        }
+
+        // State variables
+        let currentLang = 'ru';
+        let currentTheme = 'system';
+        let activeAbortController = null;
+        let lastResultData = null;
+        let isLogInitial = true;
+
+        // Theme Management
+        function initTheme() {
+            const savedTheme = safeGetItem('monero_theme', 'system');
+            setTheme(savedTheme, false);
+
+            // Listen for OS system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (currentTheme === 'system') {
+                    applyThemeColorMode('system');
+                }
+            });
+        }
+
+        function setTheme(theme, save = true) {
+            currentTheme = theme;
+            if (save) {
+                safeSetItem('monero_theme', theme);
+            }
+            applyThemeColorMode(theme);
+        }
+
+        function applyThemeColorMode(theme) {
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-color-mode', isDark ? 'dark' : 'light');
+            document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+            // Update UI buttons active state
+            document.querySelectorAll('#themeSwitcher .segment-btn').forEach(btn => {
+                const isActive = btn.dataset.themeVal === theme;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        }
+
+        // Language Management
+        function initLang() {
+            const savedLang = safeGetItem('monero_lang');
+            if (savedLang && (savedLang === 'ru' || savedLang === 'en')) {
+                setLang(savedLang, false);
+            } else {
+                const browserLang = (navigator.language || '').toLowerCase();
+                const defaultLang = browserLang.startsWith('ru') ? 'ru' : 'en';
+                setLang(defaultLang, false);
+            }
+        }
+
+        function setLang(lang, save = true) {
+            if (!I18N[lang]) return;
+            currentLang = lang;
+            if (save) {
+                safeSetItem('monero_lang', lang);
+            }
+            document.documentElement.lang = lang;
+            document.title = I18N[lang].pageTitle;
+
+            // Update text elements with data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (I18N[lang][key]) {
+                    el.textContent = I18N[lang][key];
+                }
+            });
+
+            // Update buttons active state
+            document.querySelectorAll('#langSwitcher .segment-btn').forEach(btn => {
+                const isActive = btn.dataset.lang === lang;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+
+            // Update GitHub link anchor based on language
+            const githubLink = document.getElementById('githubLink');
+            if (githubLink) {
+                githubLink.href = lang === 'en'
+                    ? 'https://github.com/Antony-hash512/monero-height#english'
+                    : 'https://github.com/Antony-hash512/monero-height#russian';
+            }
+
+            // If log has not been populated with search data, update its initial prompt
+            if (isLogInitial) {
+                const out = document.getElementById('output');
+                if (out) out.textContent = I18N[lang].logInitial;
+            }
+
+            // Re-render result card if present
+            if (lastResultData) {
+                renderResult(lastResultData);
+            }
+        }
+
+        function t(key, params = {}) {
+            let str = (I18N[currentLang] && I18N[currentLang][key]) || (I18N.en[key] || key);
+            for (const [k, v] of Object.entries(params)) {
+                str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+            }
+            return str;
+        }
+
+        // Format difference in human readable form
+        function formatDiff(diffSec) {
+            if (diffSec === 0) return t('diffExact');
+            if (diffSec < 60) return t('diffSec', { n: diffSec });
+            
+            const minutes = Math.floor(diffSec / 60);
+            if (minutes < 60) return t('diffMin', { n: minutes });
+            
+            const hours = Math.floor(minutes / 60);
+            const remMin = minutes % 60;
+            if (hours < 24) return t('diffHours', { h: hours, m: remMin });
+            
+            const days = Math.floor(hours / 24);
+            const remHours = hours % 24;
+            return t('diffDays', { d: days, h: remHours });
+        }
+
+        // Helper to format Date into datetime-local string
+        function toDateTimeLocal(d) {
+            const pad = n => String(n).padStart(2, '0');
+            const YYYY = d.getFullYear();
+            const MM = pad(d.getMonth() + 1);
+            const DD = pad(d.getDate());
+            const hh = pad(d.getHours());
+            const mm = pad(d.getMinutes());
+            return `${YYYY}-${MM}-${DD}T${hh}:${mm}`;
+        }
+
+        // Preset Handler
+        function applyPreset(preset) {
+            const dateInput = document.getElementById('dateInput');
+            const now = new Date();
+            let targetDate = new Date();
+
+            switch (preset) {
+                case '1d':
+                    targetDate = new Date(now.getTime() - 24 * 3600 * 1000);
+                    break;
+                case '7d':
+                    targetDate = new Date(now.getTime() - 7 * 24 * 3600 * 1000);
+                    break;
+                case '30d':
+                    targetDate = new Date(now.getTime() - 30 * 24 * 3600 * 1000);
+                    break;
+                case '1y':
+                    targetDate = new Date(now.getTime() - 365 * 24 * 3600 * 1000);
+                    break;
+                case '5y':
+                    targetDate = new Date(now.getFullYear() - 5, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+                    break;
+                case 'genesis':
+                    // Monero Block 1: 2014-04-18 10:49:53 UTC
+                    targetDate = new Date('2014-04-18T10:49:53Z');
+                    break;
+            }
+
+            dateInput.value = toDateTimeLocal(targetDate);
+        }
+
+        // API Fetcher with abort signal support
+        async function fetchApi(path, signal) {
+            const res = await fetch(`https://xmrchain.net/api${path}`, { signal });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        }
+
+        // Copy helpers
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                const feedback = document.getElementById('copyFeedback');
+                feedback.classList.add('show');
+                setTimeout(() => feedback.classList.remove('show'), 2000);
+            } catch (e) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                const feedback = document.getElementById('copyFeedback');
+                feedback.classList.add('show');
+                setTimeout(() => feedback.classList.remove('show'), 2000);
+            }
+        }
+
+        function copyHeight() {
+            if (lastResultData) copyToClipboard(String(lastResultData.bestHeight));
+        }
+
+        function copyHash() {
+            if (lastResultData) copyToClipboard(lastResultData.block.hash);
+        }
+
+        function copyLog() {
+            const out = document.getElementById('output');
+            copyToClipboard(out.textContent);
+        }
+
+        function clearLog() {
+            isLogInitial = true;
+            const out = document.getElementById('output');
+            out.textContent = t('logInitial');
+        }
+
+        function stopSearch() {
+            if (activeAbortController) {
+                activeAbortController.abort();
+                activeAbortController = null;
+            }
+        }
+
+        function renderResult(data) {
+            const card = document.getElementById('resultCard');
+            const resHeight = document.getElementById('resHeight');
+            const resDiff = document.getElementById('resDiff');
+            const resTimeLocal = document.getElementById('resTimeLocal');
+            const resTimeUtc = document.getElementById('resTimeUtc');
+            const resHash = document.getElementById('resHash');
+            const explorerLink = document.getElementById('explorerLink');
+
+            resHeight.textContent = data.bestHeight.toLocaleString();
+            resDiff.textContent = `± ${formatDiff(data.bestDiff)}`;
+
+            const blockDate = new Date(data.block.timestamp * 1000);
+            resTimeLocal.textContent = blockDate.toLocaleString();
+            resTimeUtc.textContent = blockDate.toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+            resHash.textContent = data.block.hash;
+            explorerLink.href = `https://xmrchain.net/block/${data.bestHeight}`;
+
+            card.style.display = 'block';
+        }
+
+        // Binary Search Algorithm
+        async function findBlock() {
+            const out = document.getElementById('output');
+            const dateVal = document.getElementById('dateInput').value;
+            const btnSearch = document.getElementById('btnSearch');
+            const btnStop = document.getElementById('btnStop');
+            const progressBox = document.getElementById('progressBox');
+            const progressStatusText = document.getElementById('progressStatusText');
+            const progressStepText = document.getElementById('progressStepText');
+            const progressBarFill = document.getElementById('progressBarFill');
+            const resultCard = document.getElementById('resultCard');
+
+            if (!dateVal) {
+                out.textContent = t('errSelectDate');
+                return;
+            }
+
+            const targetTs = Math.floor(new Date(dateVal).getTime() / 1000);
+            const targetDateStr = new Date(targetTs * 1000).toLocaleString();
+
+            // Check genesis threshold (Block 1: 1397818193)
+            const GENESIS_TS = 1397818193;
+            if (targetTs < GENESIS_TS - 7200) {
+                out.textContent = t('errDateGenesis');
+                return;
+            }
+
+            isLogInitial = false;
+
+            // Setup UI for searching state
+            activeAbortController = new AbortController();
+            const signal = activeAbortController.signal;
+
+            btnSearch.disabled = true;
+            btnStop.style.display = 'inline-flex';
+            progressBox.style.display = 'flex';
+            progressBarFill.style.width = '5%';
+            progressStatusText.textContent = t('statusSearching');
+            resultCard.style.display = 'none';
+
+            out.textContent = t('logTargetTs', { local: targetDateStr, ts: targetTs });
+            out.textContent += t('logFetchingNet');
+
+            try {
+                const netInfo = await fetchApi('/networkinfo', signal);
+                const currentChainHeight = netInfo.data.height;
+
+                let low = 1;
+                let high = currentChainHeight;
+                let bestHeight = 1;
+                let bestDiff = Infinity;
+                let bestBlock = null;
+                let step = 1;
+                const estimatedSteps = Math.ceil(Math.log2(currentChainHeight)) + 1;
+                const blockCache = new Map();
+
+                out.textContent += t('logNetInfo', { height: currentChainHeight.toLocaleString() });
+
+                while (low <= high) {
+                    if (signal.aborted) {
+                        throw new DOMException('Aborted by user', 'AbortError');
+                    }
+
+                    const mid = Math.floor((low + high) / 2);
+                    const progressPercent = Math.min(95, Math.round((step / estimatedSteps) * 95));
+                    progressBarFill.style.width = `${progressPercent}%`;
+                    progressStepText.textContent = t('progressStep', { step: step, total: estimatedSteps });
+
+                    let blockData;
+                    if (blockCache.has(mid)) {
+                        blockData = blockCache.get(mid);
+                    } else {
+                        const res = await fetchApi(`/block/${mid}`, signal);
+                        blockData = res.data;
+                        blockCache.set(mid, blockData);
+                    }
+
+                    const midTs = blockData.timestamp;
+                    const diff = Math.abs(midTs - targetTs);
+                    const blockDateStr = new Date(midTs * 1000).toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+                    const diffStr = formatDiff(diff);
+
+                    out.textContent += t('logStep', {
+                        step: step++,
+                        mid: mid.toLocaleString(),
+                        dateStr: blockDateStr,
+                        diffStr: diffStr
+                    });
+                    out.scrollTop = out.scrollHeight;
+
+                    if (diff < bestDiff) {
+                        bestDiff = diff;
+                        bestHeight = mid;
+                        bestBlock = blockData;
+                    }
+
+                    if (midTs === targetTs) {
+                        break;
+                    } else if (midTs < targetTs) {
+                        low = mid + 1;
+                    } else {
+                        high = mid - 1;
+                    }
+                }
+
+                // If bestBlock wasn't retained, fetch it
+                if (!bestBlock || bestBlock.timestamp === undefined) {
+                    out.textContent += t('logBestBlockFetch', { height: bestHeight });
+                    const finalRes = await fetchApi(`/block/${bestHeight}`, signal);
+                    bestBlock = finalRes.data;
+                }
+
+                progressBarFill.style.width = '100%';
+                progressStatusText.textContent = t('statusCompleted');
+
+                const finalDateUtc = new Date(bestBlock.timestamp * 1000).toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+                const finalDateLocal = new Date(bestBlock.timestamp * 1000).toLocaleString();
+                const finalDiffStr = formatDiff(bestDiff);
+
+                out.textContent += t('logSuccessHeader', {
+                    height: bestHeight.toLocaleString(),
+                    hash: bestBlock.hash,
+                    timeUtc: finalDateUtc,
+                    timeLocal: finalDateLocal,
+                    diffStr: `± ${finalDiffStr}`
+                });
+                out.scrollTop = out.scrollHeight;
+
+                lastResultData = {
+                    bestHeight,
+                    bestDiff,
+                    block: bestBlock
+                };
+
+                renderResult(lastResultData);
+
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    out.textContent += t('logCancelled');
+                    progressStatusText.textContent = t('statusCancelled');
+                } else {
+                    out.textContent += `\n${t('errNetwork', { msg: err.message })}`;
+                    progressStatusText.textContent = t('statusError');
+                }
+            } finally {
+                btnSearch.disabled = false;
+                btnStop.style.display = 'none';
+                activeAbortController = null;
+                setTimeout(() => {
+                    if (!activeAbortController) {
+                        progressBox.style.display = 'none';
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize event listeners and state on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initLang();
+
+            // Set default date to current time
+            document.getElementById('dateInput').value = toDateTimeLocal(new Date());
+
+            // Theme switcher buttons
+            document.querySelectorAll('#themeSwitcher .segment-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = btn.getAttribute('data-theme-val');
+                    setTheme(theme);
+                });
+            });
+
+            // Language switcher buttons (strictly without emoji flags)
+            document.querySelectorAll('#langSwitcher .segment-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const lang = btn.getAttribute('data-lang');
+                    setLang(lang);
+                });
+            });
+
+            // Allow Enter key in date input to start search
+            document.getElementById('dateInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    findBlock();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
