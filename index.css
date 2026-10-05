@@ -4,6 +4,7 @@
   --text-primary: #ffffff;
   --text-secondary: #a0a0a0;
   --accent-rust: #f74c00;
+  --accent-monero: #f26822;
   --accent-arch: #1793d1;
   --accent-godot: #478cbf;
   --accent-neon: #00ffcc;
@@ -189,6 +190,18 @@ h1 {
 
 .link-btn.primary:hover {
   box-shadow: 0 8px 25px rgba(23, 147, 209, 0.5);
+  filter: brightness(1.1);
+  transform: scale(1.03);
+}
+
+.link-btn.monero-btn {
+  background: linear-gradient(135deg, #f26822, #b84105);
+  border: none;
+  box-shadow: 0 4px 15px rgba(242, 104, 34, 0.35);
+}
+
+.link-btn.monero-btn:hover {
+  box-shadow: 0 8px 25px rgba(242, 104, 34, 0.55);
   filter: brightness(1.1);
   transform: scale(1.03);
 }
