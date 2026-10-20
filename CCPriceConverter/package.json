@@ -1,0 +1,24 @@
+{
+  "name": "cc-price-converter",
+  "version": "1.0.0",
+  "description": "Cryptocurrency Price & Volume Exchange Calculator with Multiple Quote Providers",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "prestart": "node scripts/build.js",
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/calculator.test.js"
+  },
+  "keywords": [
+    "crypto",
+    "calculator",
+    "defillama",
+    "coingecko",
+    "coinmarketcap",
+    "coinpaprika"
+  ],
+  "author": "Antony-hash512",
+  "license": "GPL-3.0"
+}

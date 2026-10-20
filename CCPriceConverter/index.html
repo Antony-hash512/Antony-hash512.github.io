@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="pageTitle">Cryptocurrency Rate Calculator | CCPriceConverter</title>
+  <meta name="description" content="Browser cryptocurrency rate and volume calculator from DefiLlama, CoinMarketCap, CoinGecko, and CoinPaprika" data-i18n="pageDesc">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Controls Bar: Preferences & Security -->
+    <aside class="top-controls-bar" id="top-controls-bar" aria-label="Page preferences and security">
+      <div class="top-controls-main">
+        <!-- Language Switcher: Russian / English (Default: English) -->
+        <div class="controls-group" id="lang-switch-group" role="group" aria-label="Language selection">
+          <button type="button" class="ctrl-btn lang-btn active" data-lang="en" id="btn-lang-en" aria-pressed="true">
+            <span>English</span>
+          </button>
+          <button type="button" class="ctrl-btn lang-btn" data-lang="ru" id="btn-lang-ru" aria-pressed="false">
+            <span>Русский</span>
+          </button>
+        </div>
+
+        <!-- Theme Switcher: Light, Dark, System (Default: System) -->
+        <div class="controls-group" id="theme-switch-group" role="group" aria-label="Theme selection">
+          <button type="button" class="ctrl-btn theme-btn" data-theme="light" id="btn-theme-light" title="Light theme" aria-pressed="false">
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <span class="theme-label" data-i18n="themeLight">Light</span>
+          </button>
+          <button type="button" class="ctrl-btn theme-btn" data-theme="dark" id="btn-theme-dark" title="Dark theme" aria-pressed="false">
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <span class="theme-label" data-i18n="themeDark">Dark</span>
+          </button>
+          <button type="button" class="ctrl-btn theme-btn active" data-theme="system" id="btn-theme-system" title="System theme" aria-pressed="true">
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span class="theme-label" data-i18n="themeSystem">System</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="top-controls-extra">
+        <!-- API Keys Security Controls -->
+        <div class="controls-group storage-controls-group" id="storage-controls-group" role="group" aria-label="API key storage controls">
+          <label class="ctrl-checkbox-label" for="checkbox-dont-save-keys" title="Prevent saving API keys to browser localStorage" data-i18n-title="dontSaveKeysTooltip">
+            <span class="custom-checkbox mini">
+              <input type="checkbox" id="checkbox-dont-save-keys">
+              <span class="checkbox-visual">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </span>
+            <span class="ctrl-checkbox-text" data-i18n="dontSaveKeys">Do not save keys</span>
+          </label>
+
+          <span class="ctrl-group-divider" aria-hidden="true"></span>
+
+          <button type="button" class="ctrl-btn clear-keys-btn" id="btn-clear-saved-keys" title="Clear saved API keys from localStorage" data-i18n-title="clearKeysTooltip">
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span data-i18n="clearSavedKeys">Clear keys</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-badge">
+        <span class="pulse-dot"></span>
+        <span data-i18n="brandBadge">Multi-Provider Exchange Rates</span>
+      </div>
+      <h1 class="app-title" data-i18n="appTitle">Crypto Rate Calculator</h1>
+      <p class="app-subtitle" data-i18n="appSubtitle">
+        Compare live quotes and evaluate exchange efficiency via APIs from leading providers
+      </p>
+    </header>
+
+    <!-- Section 1: Providers -->
+    <section class="card-section" id="section-providers">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>📡</span>
+          <span data-i18n="providersTitle">Quote Providers</span>
+        </h2>
+        <span class="section-badge" id="providers-count-badge">1 of 4 active</span>
+      </div>
+
+      <div class="providers-list" id="providers-list">
+        <!-- DefiLlama (Checked by default, no API key) -->
+        <div class="provider-row active" id="provider-row-defillama" data-provider-id="defillama">
+          <label class="provider-label-wrap" for="checkbox-provider-defillama">
+            <span class="custom-checkbox">
+              <input type="checkbox" id="checkbox-provider-defillama" data-provider="defillama" checked>
+              <span class="checkbox-visual">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </span>
+            <div class="provider-info">
+              <span class="provider-icon icon-llama">🦙</span>
+              <span class="provider-name">DefiLlama</span>
+              <span class="provider-tag" data-i18n="noKeyRequired">No Key Required</span>
+            </div>
+          </label>
+          <div class="api-key-container" id="api-key-box-defillama">
+            <!-- DefiLlama does not require a key -->
+          </div>
+        </div>
+
+        <!-- CoinMarketCap -->
+        <!-- CoinMarketCap -->
+        <div class="provider-row hint-expanded" id="provider-row-coinmarketcap" data-provider-id="coinmarketcap">
+          <div class="provider-row-main">
+            <div class="provider-label-group">
+              <label class="provider-label-wrap" for="checkbox-provider-coinmarketcap">
+                <span class="custom-checkbox">
+                  <input type="checkbox" id="checkbox-provider-coinmarketcap" data-provider="coinmarketcap">
+                  <span class="checkbox-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </span>
+                </span>
+                <div class="provider-info">
+                  <span class="provider-icon icon-cmc">M</span>
+                  <span class="provider-name">CoinMarketCap</span>
+                  <span class="provider-tag" data-i18n="apiKeyTag">API Key</span>
+                </div>
+              </label>
+              <!-- Кнопка разворачивания/сворачивания справа от надписи "API ключ" -->
+              <button type="button" class="cmc-hint-toggle-badge" id="btn-toggle-cmc-hint" aria-expanded="true" title="Collapse hint" data-i18n-title="cmcCollapseTooltip">
+                <span class="badge-icon">💡</span>
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+              </button>
+            </div>
+
+            <div class="api-key-container" id="api-key-box-coinmarketcap">
+              <div class="api-key-wrapper">
+                <span class="key-status-indicator is-hidden" id="key-status-coinmarketcap" title="API key is saved in localStorage" data-i18n-title="keySavedDiskTooltip">
+                  <span class="disk-emoji">💾</span>
+                  <span class="strike-line" aria-hidden="true"></span>
+                </span>
+                <input 
+                  type="password" 
+                  id="input-key-coinmarketcap" 
+                  class="api-key-input" 
+                  placeholder="Enter CMC API key (X-CMC_PRO_API_KEY)" 
+                  data-i18n-placeholder="cmcPlaceholder"
+                  autocomplete="off"
+                  spellcheck="false"
+                >
+                <button type="button" class="key-toggle-btn" data-target="input-key-coinmarketcap" title="Show/hide key" data-i18n-title="keyToggleTitle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Блок с текстом подсказки (развёрнут по умолчанию, полностью исчезает при сворачивании) -->
+          <div class="provider-hint-bar" id="cmc-proxy-hint-bar">
+            <span class="hint-icon">💡</span>
+            <span class="hint-text" data-i18n-html="cmcProxyNoticeHtml">Run local proxy for CoinMarketCap: <code>npm start</code> or <code>python3 server.py</code> | See <a href="instructions.html" class="hint-link">Instructions</a></span>
+          </div>
+        </div>
+
+        <!-- CoinGecko -->
+        <div class="provider-row" id="provider-row-coingecko" data-provider-id="coingecko">
+          <label class="provider-label-wrap" for="checkbox-provider-coingecko">
+            <span class="custom-checkbox">
+              <input type="checkbox" id="checkbox-provider-coingecko" data-provider="coingecko">
+              <span class="checkbox-visual">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </span>
+            <div class="provider-info">
+              <span class="provider-icon icon-gecko">🦎</span>
+              <span class="provider-name">CoinGecko</span>
+              <span class="provider-tag" data-i18n="demoProKeyTag">Demo / Pro Key</span>
+            </div>
+          </label>
+          <div class="api-key-container" id="api-key-box-coingecko">
+            <label class="keyless-option-wrap" for="checkbox-keyless-coingecko" title="Send requests without API key (public free tier)" data-i18n-title="keylessTooltip">
+              <span class="custom-checkbox custom-checkbox-sm">
+                <input type="checkbox" id="checkbox-keyless-coingecko" data-keyless-provider="coingecko" checked>
+                <span class="checkbox-visual">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+              </span>
+              <span class="keyless-text" data-i18n="keylessCheckbox">Without key</span>
+            </label>
+            <div class="api-key-wrapper keyless-mode" id="api-key-wrapper-coingecko">
+              <span class="key-status-indicator is-hidden" id="key-status-coingecko" title="API key is saved in localStorage" data-i18n-title="keySavedDiskTooltip">
+                <span class="disk-emoji">💾</span>
+                <span class="strike-line" aria-hidden="true"></span>
+              </span>
+              <input 
+                type="password" 
+                id="input-key-coingecko" 
+                class="api-key-input" 
+                placeholder="Demo/Pro API key" 
+                data-i18n-placeholder="geckoPlaceholder"
+                autocomplete="off"
+                spellcheck="false"
+                disabled
+              >
+              <button type="button" class="key-toggle-btn" data-target="input-key-coingecko" title="Show/hide key" data-i18n-title="keyToggleTitle">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CoinPaprika -->
+        <div class="provider-row" id="provider-row-coinpaprika" data-provider-id="coinpaprika">
+          <label class="provider-label-wrap" for="checkbox-provider-coinpaprika">
+            <span class="custom-checkbox">
+              <input type="checkbox" id="checkbox-provider-coinpaprika" data-provider="coinpaprika">
+              <span class="checkbox-visual">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </span>
+            <div class="provider-info">
+              <span class="provider-icon icon-paprika">🌶️</span>
+              <span class="provider-name">CoinPaprika</span>
+              <span class="provider-tag" data-i18n="proKeyTag">Pro Key</span>
+            </div>
+          </label>
+          <div class="api-key-container" id="api-key-box-coinpaprika">
+            <label class="keyless-option-wrap" for="checkbox-keyless-coinpaprika" title="Send requests without API key (public free tier)" data-i18n-title="keylessTooltip">
+              <span class="custom-checkbox custom-checkbox-sm">
+                <input type="checkbox" id="checkbox-keyless-coinpaprika" data-keyless-provider="coinpaprika" checked>
+                <span class="checkbox-visual">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+              </span>
+              <span class="keyless-text" data-i18n="keylessCheckbox">Without key</span>
+            </label>
+            <div class="api-key-wrapper keyless-mode" id="api-key-wrapper-coinpaprika">
+              <span class="key-status-indicator is-hidden" id="key-status-coinpaprika" title="API key is saved in localStorage" data-i18n-title="keySavedDiskTooltip">
+                <span class="disk-emoji">💾</span>
+                <span class="strike-line" aria-hidden="true"></span>
+              </span>
+              <input 
+                type="password" 
+                id="input-key-coinpaprika" 
+                class="api-key-input" 
+                placeholder="Pro API key" 
+                data-i18n-placeholder="paprikaPlaceholder"
+                autocomplete="off"
+                spellcheck="false"
+                disabled
+              >
+              <button type="button" class="key-toggle-btn" data-target="input-key-coinpaprika" title="Show/hide key" data-i18n-title="keyToggleTitle">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Input (Sell & Buy) -->
+    <section class="card-section" id="section-input">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>⚖️</span>
+          <span data-i18n="inputTitle">Exchange Parameters (Input)</span>
+        </h2>
+        <span class="section-badge" data-i18n="inputBadge">Trade</span>
+      </div>
+
+      <div class="input-grid">
+        <!-- Column 1: Sell -->
+        <div class="trade-column sell" id="trade-column-sell">
+          <div class="column-header">
+            <span class="column-label" data-i18n="sellColumnTitle">Sell</span>
+            <span class="column-badge" data-i18n="sellBadge">You Pay</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="select-currency-sell" data-i18n="sellCurrencyLabel">Cryptocurrency to Sell</label>
+            <div class="custom-select-wrapper">
+              <select id="select-currency-sell" class="custom-select">
+                <option value="BTC" selected>Bitcoin (BTC)</option>
+                <option value="ETH">Ethereum (ETH)</option>
+                <option value="BCH">Bitcoin Cash (BCH)</option>
+                <option value="ZEC">Zcash (ZEC)</option>
+                <option value="XMR">Monero (XMR)</option>
+                <option value="XRP">Ripple (XRP)</option>
+              </select>
+              <div class="select-arrow">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="input-amount-sell" data-i18n="sellAmountLabel">Quantity</label>
+            <div class="number-input-wrapper">
+              <input 
+                type="number" 
+                id="input-amount-sell" 
+                class="number-input" 
+                step="any" 
+                min="0" 
+                placeholder="0.00"
+                value="1"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Buy -->
+        <div class="trade-column buy" id="trade-column-buy">
+          <div class="column-header">
+            <span class="column-label" data-i18n="buyColumnTitle">Buy</span>
+            <span class="column-badge" data-i18n="buyBadge">You Receive</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="select-currency-buy" data-i18n="buyCurrencyLabel">Cryptocurrency to Buy</label>
+            <div class="custom-select-wrapper">
+              <select id="select-currency-buy" class="custom-select">
+                <option value="BTC">Bitcoin (BTC)</option>
+                <option value="ETH" selected>Ethereum (ETH)</option>
+                <option value="BCH">Bitcoin Cash (BCH)</option>
+                <option value="ZEC">Zcash (ZEC)</option>
+                <option value="XMR">Monero (XMR)</option>
+                <option value="XRP">Ripple (XRP)</option>
+              </select>
+              <div class="select-arrow">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="input-amount-buy" data-i18n="buyAmountLabel">Quantity</label>
+            <div class="number-input-wrapper">
+              <input 
+                type="number" 
+                id="input-amount-buy" 
+                class="number-input" 
+                step="any" 
+                min="0" 
+                placeholder="0.00"
+                value="30"
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button "Calculate" with 3-second lockout -->
+      <div class="action-button-container">
+        <button type="button" id="btn-calculate" class="btn-calculate">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span id="btn-calculate-text" data-i18n="btnCalculate">Calculate</span>
+          <div class="cooldown-bar" id="btn-cooldown-bar"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Section 3: Output (Provider Cards) -->
+    <section class="card-section" id="section-output">
+      <div class="output-section-header">
+        <h2 class="section-title">
+          <span>📊</span>
+          <span data-i18n="outputTitle">Calculation Results (Output)</span>
+        </h2>
+        <span class="section-badge" id="output-status-badge" data-i18n="outputIdleBadge">Awaiting calculation</span>
+      </div>
+
+      <!-- Cards Container -->
+      <div class="output-cards-grid" id="output-cards-container">
+        <div class="output-empty-state" id="output-empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+          <p data-i18n="emptyStateText">Select providers, enter trade amounts, and click «Calculate»</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div data-i18n="footerTitle">CCPriceConverter • Browser Cryptocurrency Rate Calculator</div>
+      <div class="footer-links">
+        <a href="https://github.com/Antony-hash512/CCPriceConverter" target="_blank" rel="noopener noreferrer" class="footer-github-link" title="GitHub Repository">
+          <svg class="footer-github-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub: Antony-hash512/CCPriceConverter</span>
+        </a>
+      </div>
+    </footer>
+
+  <!-- Modal: Confirm Keep or Clear Saved Keys -->
+  <div class="modal-backdrop" id="modal-clear-keys" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-clear-keys-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-icon-badge">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3 class="modal-title" id="modal-clear-keys-title" data-i18n="modalConfirmTitle">Saved Keys in Storage</h3>
+        <button type="button" class="modal-close-btn" id="modal-btn-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" data-i18n="modalConfirmText">
+          API keys are already saved in localStorage. Would you like to clear them now or keep them?
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal btn-modal-danger" id="modal-btn-clear" data-i18n="modalActionClear">
+          Clear
+        </button>
+        <button type="button" class="btn-modal btn-modal-primary" id="modal-btn-keep" data-i18n="modalActionKeep">
+          Keep
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-notification" id="toast-notification" role="status" aria-live="polite"></div>
+
+  <!-- Scripts: Standalone bundle works on localhost, static servers, and directly via file:// without any backend -->
+  <script src="js/app.bundle.js"></script>
+</body>
+</html>

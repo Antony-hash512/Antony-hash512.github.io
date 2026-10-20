@@ -1,0 +1,309 @@
+/**
+ * CCPriceConverter - Модуль локализации (i18n)
+ * Поддерживаемые языки: Английский (en - по умолчанию), Русский (ru)
+ */
+
+export const TRANSLATIONS = {
+  en: {
+    pageTitle: "Cryptocurrency Rate Calculator | CCPriceConverter",
+    pageDesc: "Browser cryptocurrency rate and volume calculator from DefiLlama, CoinMarketCap, CoinGecko, and CoinPaprika",
+    brandBadge: "Multi-Provider Exchange Rates",
+    appTitle: "Crypto Rate Calculator",
+    appSubtitle: "Compare live quotes and evaluate exchange efficiency via APIs from leading providers",
+    
+    // Top bar themes
+    themeLight: "Light",
+    themeDark: "Dark",
+    themeSystem: "System",
+
+    // Section 1: Providers
+    providersTitle: "Quote Providers",
+    providersActiveBadge: "{active} of {total} active",
+    noKeyRequired: "No Key Required",
+    apiKeyTag: "API Key",
+    demoProKeyTag: "Demo / Pro Key",
+    proKeyTag: "Pro Key",
+    cmcPlaceholder: "Enter CMC API key (X-CMC_PRO_API_KEY)",
+    geckoPlaceholder: "Demo/Pro API key (optional)",
+    paprikaPlaceholder: "Pro API key (optional)",
+    keyToggleTitle: "Show/hide key",
+    singleProviderTooltip: "Cannot uncheck the only active provider",
+    keylessCheckbox: "Without key",
+    keylessTooltip: "Send requests without API key (public free tier)",
+    keylessDisabledInputTooltip: "Keyless mode is active. Uncheck «Without key» to enter API key.",
+    modeKeylessBadge: "Keyless",
+    modeWithKeyBadge: "With Key",
+
+    // Section 2: Input
+    inputTitle: "Exchange Parameters (Input)",
+    inputBadge: "Trade",
+    sellColumnTitle: "Sell",
+    sellBadge: "You Pay",
+    sellCurrencyLabel: "Cryptocurrency to Sell",
+    sellAmountLabel: "Quantity",
+    buyColumnTitle: "Buy",
+    buyBadge: "You Receive",
+    buyCurrencyLabel: "Cryptocurrency to Buy",
+    buyAmountLabel: "Quantity",
+
+    btnCalculate: "Calculate",
+    btnSent: "Sent",
+
+    // Section 3: Output
+    outputTitle: "Calculation Results (Output)",
+    outputIdleBadge: "Awaiting calculation",
+    outputLoadingBadge: "Querying {count} provider(s)...",
+    outputUpdated: "Updated at {time}",
+    emptyStateText: "Select providers, enter trade amounts, and click «Calculate»",
+
+    // Metrics inside cards
+    metricRateSell: "1 {sym} (Sell)",
+    metricRateBuy: "1 {sym} (Buy)",
+    metricCurrentRate: "Current API Rate",
+    metricTotalSell: "Total Given ({amount} {sym})",
+    metricSellVolumeUsd: "Sell volume in USD",
+    metricTotalBuy: "Total Received ({amount} {sym})",
+    metricBuyVolumeUsd: "Buy volume in USD",
+    
+    diffHeader: "Difference Calculation",
+    diffStatusLossHigh: "Loss (> $20)",
+    diffStatusLossLow: "Loss (≤ $20)",
+    diffStatusProfit: "Profit",
+    diffRelativeVolume: "Relative to volume:",
+    statusSuccess: "Rates received",
+    statusLoading: "Loading rates...",
+    statusError: "Request error",
+    failedToFetch: "Failed to fetch rates:",
+    missingRate: "Provider did not return a rate for {sym}.",
+    cmcProxyHint: "💡 DefiLlama, CoinGecko, and CoinPaprika work 100% serverless. For CoinMarketCap, start `npm start` or use a CORS proxy.",
+    cmcKeyRequired: "CoinMarketCap requires an API key. Please enter your key in the provider field.",
+    cmcProxyUnreachable: "Cannot reach proxy for CoinMarketCap. DefiLlama, CoinGecko, and CoinPaprika work directly without a server.",
+    coingeckoRateLimit: "CoinGecko: Rate Limit (429) reached. Please try again later or use an API key.",
+
+    // Alerts
+    alertPositiveSell: "Please enter a valid positive quantity for the currency to sell.",
+    alertPositiveBuy: "Please enter a valid positive quantity for the currency to buy.",
+    alertSelectProvider: "At least one quote provider must be selected.",
+
+    // CMC permanent proxy notice
+    cmcProxyNoticeHtml: 'CoinMarketCap proxy: <code>npm start</code> or <code>python3 server.py</code> | DefiLlama, CoinGecko & CoinPaprika work without a server',
+    cmcHintCollapsedPreview: "CoinMarketCap proxy notes (click to expand)",
+    cmcCollapseTooltip: "Collapse hint",
+    cmcExpandTooltip: "Expand hint",
+
+    // API Key Storage & Security Controls
+    dontSaveKeys: "Do not save keys",
+    dontSaveKeysTooltip: "Prevent saving API keys to browser localStorage",
+    clearSavedKeys: "Clear keys",
+    clearKeysTooltip: "Delete saved API keys from browser localStorage",
+    keysClearedToast: "Saved API keys cleared from localStorage",
+    keySavedDiskTooltip: "API key is saved in localStorage",
+    keyNotSavedTooltip: "API key is not saved to localStorage (preventive mode active)",
+    modalConfirmTitle: "Saved Keys in Storage",
+    modalConfirmText: "API keys are already saved in localStorage. Would you like to clear them now or keep them?",
+    modalActionClear: "Clear",
+    modalActionKeep: "Keep",
+
+    // Footer
+    footerTitle: "CCPriceConverter • Browser Cryptocurrency Rate Calculator"
+  },
+
+  ru: {
+    pageTitle: "Калькулятор курсов криптовалют | CCPriceConverter",
+    pageDesc: "Браузерный калькулятор курсов и объемов криптовалют от DefiLlama, CoinMarketCap, CoinGecko и CoinPaprika",
+    brandBadge: "Мультипровайдерный обменный курс",
+    appTitle: "Калькулятор курсов криптовалют",
+    appSubtitle: "Сравнение котировок и оценка эффективности обмена по API от ведущих провайдеров",
+    
+    // Top bar themes
+    themeLight: "Светлая",
+    themeDark: "Тёмная",
+    themeSystem: "Системная",
+
+    // Section 1: Providers
+    providersTitle: "Провайдеры котировок",
+    providersActiveBadge: "{active} из {total} активно",
+    noKeyRequired: "Без ключа",
+    apiKeyTag: "API ключ",
+    demoProKeyTag: "Demo / Pro ключ",
+    proKeyTag: "Pro ключ",
+    cmcPlaceholder: "Вставьте CMC API ключ (X-CMC_PRO_API_KEY)",
+    geckoPlaceholder: "Demo/Pro API ключ (опционально)",
+    paprikaPlaceholder: "Pro API ключ (опционально)",
+    keyToggleTitle: "Показать/скрыть ключ",
+    singleProviderTooltip: "Нельзя отключить единственный активный провайдер",
+    keylessCheckbox: "Без ключа",
+    keylessTooltip: "Запрос без API-ключа (публичный бесплатный тариф)",
+    keylessDisabledInputTooltip: "Включен режим без ключа. Снимите отметку «Без ключа» для ввода API-ключа.",
+    modeKeylessBadge: "Без ключа",
+    modeWithKeyBadge: "С ключом",
+
+    // Section 2: Input
+    inputTitle: "Параметры обмена (Input)",
+    inputBadge: "Сделка",
+    sellColumnTitle: "Продажа",
+    sellBadge: "Отдаём",
+    sellCurrencyLabel: "Криптовалюта для продажи",
+    sellAmountLabel: "Количество",
+    buyColumnTitle: "Покупка",
+    buyBadge: "Получаем",
+    buyCurrencyLabel: "Криптовалюта для покупки",
+    buyAmountLabel: "Количество",
+
+    btnCalculate: "Посчитать",
+    btnSent: "Отправлено",
+
+    // Section 3: Output
+    outputTitle: "Результаты расчёта (Output)",
+    outputIdleBadge: "Ожидание запуска",
+    outputLoadingBadge: "Запрос к {count} провайдер(ам)...",
+    outputUpdated: "Обновлено в {time}",
+    emptyStateText: "Выберите нужных провайдеров, укажите объёмы и нажмите кнопку «Посчитать»",
+
+    // Metrics inside cards
+    metricRateSell: "1 {sym} (Продажа)",
+    metricRateBuy: "1 {sym} (Покупка)",
+    metricCurrentRate: "Текущий курс API",
+    metricTotalSell: "Всего отдаем ({amount} {sym})",
+    metricSellVolumeUsd: "Объем продажи в USD",
+    metricTotalBuy: "Всего получаем ({amount} {sym})",
+    metricBuyVolumeUsd: "Объем покупки в USD",
+    
+    diffHeader: "Расчёт разницы",
+    diffStatusLossHigh: "Потери (> $20)",
+    diffStatusLossLow: "Потери (до $20)",
+    diffStatusProfit: "Профит",
+    diffRelativeVolume: "Относительно объема:",
+    statusSuccess: "Котировки получены",
+    statusLoading: "Загрузка котировок...",
+    statusError: "Ошибка запроса",
+    failedToFetch: "Не удалось получить котировки:",
+    missingRate: "Провайдер не вернул котировку для {sym}.",
+    cmcProxyHint: "💡 Провайдеры DefiLlama, CoinGecko и CoinPaprika работают без сервера. Для CoinMarketCap запустите `npm start` или используйте CORS-прокси.",
+    cmcKeyRequired: "CoinMarketCap требует обязательный API-ключ. Пожалуйста, введите ключ в поле провайдера.",
+    cmcProxyUnreachable: "Не удалось связаться с прокси для CoinMarketCap. Провайдеры DefiLlama, CoinGecko и CoinPaprika работают напрямую без сервера.",
+    coingeckoRateLimit: "CoinGecko: превышен лимит запросов (Rate Limit 429). Попробуйте позже или используйте API-ключ.",
+
+    // Alerts
+    alertPositiveSell: "Пожалуйста, введите корректное положительное количество продаваемой валюты.",
+    alertPositiveBuy: "Пожалуйста, введите корректное положительное количество покупаемой валюты.",
+    alertSelectProvider: "Необходимо выбрать хотя бы одного провайдера котировок.",
+
+    // CMC permanent proxy notice
+    cmcProxyNoticeHtml: 'Прокси для CoinMarketCap: <code>npm start</code> или <code>python3 server.py</code> | DefiLlama, CoinGecko и CoinPaprika работают без сервера',
+    cmcHintCollapsedPreview: "Настройка прокси для CoinMarketCap (нажмите, чтобы развернуть)",
+    cmcCollapseTooltip: "Свернуть подсказку",
+    cmcExpandTooltip: "Развернуть подсказку",
+
+    // API Key Storage & Security Controls
+    dontSaveKeys: "Не сохранять ключи",
+    dontSaveKeysTooltip: "Превентивно не сохранять API-ключи в localStorage браузера",
+    clearSavedKeys: "Стереть ключи",
+    clearKeysTooltip: "Удалить сохранённые API-ключи из localStorage браузера",
+    keysClearedToast: "Сохранённые API-ключи удалены из localStorage",
+    keySavedDiskTooltip: "API-ключ сохранён в localStorage",
+    keyNotSavedTooltip: "API-ключ не сохраняется в localStorage (включен превентивный режим)",
+    modalConfirmTitle: "Сохранённые API-ключи",
+    modalConfirmText: "В localStorage браузера уже сохранены API-ключи. Очистить их или оставить сохранёнными?",
+    modalActionClear: "Очистить",
+    modalActionKeep: "Оставить",
+
+    // Footer
+    footerTitle: "CCPriceConverter • Браузерный калькулятор курсов криптовалют"
+  }
+};
+
+function resolveInitialLanguage() {
+  if (typeof window !== 'undefined' && window.location && window.location.search) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = (params.get('lang') || '').toLowerCase().trim();
+      if (urlLang === 'ru' || urlLang === 'en') {
+        localStorage.setItem(STORAGE_LANG_KEY, urlLang);
+        return urlLang;
+      }
+    } catch {}
+  }
+  const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_LANG_KEY) : null;
+  if (saved === 'ru' || saved === 'en') {
+    return saved;
+  }
+  return 'en'; // English по умолчанию
+}
+
+function syncUrlLang(lang) {
+  if (typeof window !== 'undefined' && window.location && window.history && window.history.replaceState) {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      window.history.replaceState(null, '', url.toString());
+    } catch {}
+  }
+}
+
+const STORAGE_LANG_KEY = 'cc_lang';
+let currentLang = resolveInitialLanguage();
+
+const langChangeListeners = [];
+
+export function getLanguage() {
+  return currentLang;
+}
+
+export function setLanguage(lang) {
+  if (lang !== 'en' && lang !== 'ru') return;
+  currentLang = lang;
+  localStorage.setItem(STORAGE_LANG_KEY, lang);
+  document.documentElement.lang = lang;
+  syncUrlLang(lang);
+  updateDomTranslations();
+  langChangeListeners.forEach(fn => fn(lang));
+}
+
+export function onLanguageChange(fn) {
+  langChangeListeners.push(fn);
+}
+
+/**
+ * Получить перевод по ключу с интерполяцией параметров
+ */
+export function t(key, params = {}) {
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+  let str = dict[key] || TRANSLATIONS.en[key] || key;
+  for (const [pKey, pVal] of Object.entries(params)) {
+    str = str.replace(new RegExp(`\\{${pKey}\\}`, 'g'), String(pVal));
+  }
+  return str;
+}
+
+/**
+ * Обновить все статические элементы с атрибутом [data-i18n]
+ */
+export function updateDomTranslations() {
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.lang = currentLang;
+  }
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    el.innerHTML = t(key);
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.setAttribute('placeholder', t(key));
+  });
+
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    el.setAttribute('title', t(key));
+  });
+
+  // Обновление заголовка страницы
+  document.title = t('pageTitle');
+}
