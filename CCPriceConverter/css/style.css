@@ -1632,6 +1632,73 @@ body {
   transform: translateY(-1px);
 }
 
+.doc-step-content a {
+  color: #a5b4fc;
+  transition: var(--transition-smooth);
+}
+
+[data-theme="light"] .doc-step-content a {
+  color: #4f46e5;
+}
+
+.doc-alert-warning {
+  margin-top: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.doc-alert-warning a {
+  color: #a5b4fc;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+
+.doc-alert-warning a:hover {
+  color: #c7d2fe;
+}
+
+.doc-alert-warning code {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: #fee2e2;
+}
+
+[data-theme="light"] .doc-alert-warning {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #991b1b;
+}
+
+[data-theme="light"] .doc-alert-warning strong {
+  color: #7f1d1d;
+}
+
+[data-theme="light"] .doc-alert-warning a {
+  color: #b91c1c;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+[data-theme="light"] .doc-alert-warning a:hover {
+  color: #7f1d1d;
+}
+
+[data-theme="light"] .doc-alert-warning code {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+}
+
 /* ==========================================================================
    Modal Dialog & Toast Notifications
    ========================================================================== */

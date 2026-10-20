@@ -110,145 +110,7 @@
          ==================================================================== -->
     <div class="lang-content" data-content-lang="en">
       
-      <!-- Section 1: Overview -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>ℹ️</span> About the Project
-          </h2>
-          <span class="section-badge">Overview</span>
-        </div>
-        <p style="color: var(--text-muted); margin-bottom: 1rem;">
-          <strong>CCPriceConverter</strong> is a browser-based cryptocurrency exchange rate and volume calculator that queries live APIs from 4 providers:
-        </p>
-        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem;">
-          <li>🦙 <strong>DefiLlama</strong>: Works directly in browser, no API key required.</li>
-          <li>🔵 <strong>CoinMarketCap</strong>: Requires an API key and the local proxy due to CORS restrictions.</li>
-          <li>🦎 <strong>CoinGecko</strong>: Direct browser calls, optional Demo/Pro API key.</li>
-          <li>🌶️ <strong>CoinPaprika</strong>: Direct browser calls, optional Pro API key.</li>
-        </ul>
-      </section>
-
-      <!-- Section 2: CORS & Mini-Server -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>🛡️</span> Why is a Local Mini-Server Needed for CoinMarketCap?
-          </h2>
-          <span class="section-badge">CORS Proxy</span>
-        </div>
-        <p style="color: var(--text-muted); line-height: 1.6;">
-          <strong>CoinMarketCap</strong> intentionally prevents client-side browsers from making direct API calls (missing <code>Access-Control-Allow-Origin</code> headers) to prevent private API keys from being leaked in public frontends. Direct <code>fetch()</code> calls from a browser will always be blocked with a CORS error.
-        </p>
-        <p style="color: var(--text-muted); line-height: 1.6; margin-top: 0.75rem;">
-          To resolve this without complex infrastructure, the repository includes a zero-dependency mini-server (available in both <strong>Node.js</strong> and <strong>Python 3</strong>) that serves the static assets and acts as a reverse CORS proxy for <code>/api/cmc/*</code>.
-        </p>
-        <div style="margin-top: 0.9rem; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.9rem; line-height: 1.5;">
-          ⚠️ <strong>Important Note:</strong> CoinMarketCap operation through a deployed public website (GitHub Pages / static web hosting) is <strong>not guaranteed</strong> due to strict browser CORS policies. To work with CoinMarketCap reliably, you need to download/clone the repository contents and run it locally on <code>localhost</code> using Option 1, 2, or 3.
-        </div>
-      </section>
-
-      <!-- Section 3: Launch Options -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>🚀</span> Launch Options
-          </h2>
-          <span class="section-badge">Quick Start</span>
-        </div>
-
-        <h3 style="font-size: 1rem; margin-top: 0.5rem; color: #a5b4fc;">Option 1: Run via Node.js (Recommended)</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Requires Node.js 18+. No npm packages need to be installed.</p>
-        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
-npm start
-# or: node server.js</pre>
-
-        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Option 2: Run via Python 3</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Uses the standard Python library (no pip packages needed).</p>
-        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
-python3 server.py</pre>
-
-        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Option 3: Custom Port</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Specify a port via the <code>PORT</code> environment variable:</p>
-        <pre class="doc-code-block">PORT=8080 node server.js
-# or: PORT=8080 python3 server.py</pre>
-
-        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Option 4: Standalone Run (Pure Static HTML)</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">
-          Open <code>index.html</code> directly via <code>file:///</code> or any static server. DefiLlama, CoinGecko, and CoinPaprika will work via public CORS, while CoinMarketCap operation is not guaranteed in pure static hosting and requires downloading the repository to run on localhost.
-        </p>
-      </section>
-
-      <!-- Section: Obtaining API Keys -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>🔑</span> Obtaining API Keys
-          </h2>
-          <span class="section-badge">Registration</span>
-        </div>
-
-        <div class="doc-step-list">
-          <div class="doc-step-item">
-            <div class="doc-step-num">🦙</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">DefiLlama — No key required</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                DefiLlama provides a fully free and open API. No registration or API key is needed.
-              </p>
-            </div>
-          </div>
-
-          <div class="doc-step-item">
-            <div class="doc-step-num">🔵</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">CoinMarketCap — Required key (free plan available)</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                1. Go to <a href="https://pro.coinmarketcap.com/signup" target="_blank" rel="noopener" style="color: #a5b4fc;">pro.coinmarketcap.com/signup</a> and create a free account.<br>
-                2. Choose the <strong>Basic</strong> plan (free).<br>
-                3. Confirm your email and log in to the Developer Portal.<br>
-                4. Copy your API key from the Dashboard.
-              </p>
-              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
-                ✅ Free plan: 10,000 calls/month, 30 calls/min — more than enough for this calculator.
-              </p>
-            </div>
-          </div>
-
-          <div class="doc-step-item">
-            <div class="doc-step-num">🦎</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">CoinGecko — Optional key (recommended)</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                Works without a key but with strict rate limits (~10–30 req/min). A free Demo key is recommended:
-              </p>
-              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem;">
-                1. Go to <a href="https://www.coingecko.com/en/api/pricing" target="_blank" rel="noopener" style="color: #a5b4fc;">coingecko.com/en/api/pricing</a> → click <strong>"Start for Free"</strong>.<br>
-                2. Sign up or log in (no credit card required).<br>
-                3. In the <a href="https://www.coingecko.com/en/api/dashboard" target="_blank" rel="noopener" style="color: #a5b4fc;">Developer Dashboard</a>, click <strong>"+ Add New Key"</strong>.
-              </p>
-              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
-                ✅ Free Demo plan: ~10,000 calls/month.
-              </p>
-            </div>
-          </div>
-
-          <div class="doc-step-item">
-            <div class="doc-step-num">🌶️</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">CoinPaprika — Optional key</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                Works without a key on the free tier (20,000 calls/month, top 2,000 coins). Paid plans available at <a href="https://coinpaprika.com/api/" target="_blank" rel="noopener" style="color: #a5b4fc;">coinpaprika.com/api</a>.
-              </p>
-              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
-                ✅ Free keyless access is sufficient for this calculator.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 4: Interface Guide -->
+      <!-- Section 1: Using the Interface -->
       <section class="card-section">
         <div class="section-header">
           <h2 class="section-title">
@@ -323,7 +185,145 @@ python3 server.py</pre>
         </div>
       </section>
 
-      <!-- Section 5: Raw Files -->
+      <!-- Section 2: Obtaining API Keys -->
+      <section class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🔑</span> Obtaining API Keys
+          </h2>
+          <span class="section-badge">Registration</span>
+        </div>
+
+        <div class="doc-step-list">
+          <div class="doc-step-item">
+            <div class="doc-step-num">🦙</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">DefiLlama — No key required</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                DefiLlama provides a fully free and open API. No registration or API key is needed.
+              </p>
+            </div>
+          </div>
+
+          <div class="doc-step-item">
+            <div class="doc-step-num">🔵</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">CoinMarketCap — Required key (free plan available)</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                1. Go to <a href="https://pro.coinmarketcap.com/signup" target="_blank" rel="noopener">pro.coinmarketcap.com/signup</a> and create a free account.<br>
+                2. Choose the <strong>Basic</strong> plan (free).<br>
+                3. Confirm your email and log in to the Developer Portal.<br>
+                4. Copy your API key from the Dashboard.
+              </p>
+              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
+                ✅ Free plan: 10,000 calls/month, 30 calls/min — more than enough for this calculator.
+              </p>
+              <div class="doc-alert-warning">
+                ⚠️ <strong>Important Note:</strong> CoinMarketCap operation through a deployed public website (GitHub Pages / static web hosting) is <strong>not guaranteed</strong> due to strict browser CORS policies. To work with CoinMarketCap reliably, you need to download/clone the repository contents and run it locally on <code>localhost</code> (<a href="#launch-options-en">Option 1, 2, or 3</a>).
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-step-item">
+            <div class="doc-step-num">🦎</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">CoinGecko — Optional key (recommended)</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Works without a key but with strict rate limits (~10–30 req/min). A free Demo key is recommended:
+              </p>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem;">
+                1. Go to <a href="https://www.coingecko.com/en/api/pricing" target="_blank" rel="noopener">coingecko.com/en/api/pricing</a> → click <strong>"Start for Free"</strong>.<br>
+                2. Sign up or log in (no credit card required).<br>
+                3. In the <a href="https://www.coingecko.com/en/api/dashboard" target="_blank" rel="noopener">Developer Dashboard</a>, click <strong>"+ Add New Key"</strong>.
+              </p>
+              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
+                ✅ Free Demo plan: ~10,000 calls/month.
+              </p>
+            </div>
+          </div>
+
+          <div class="doc-step-item">
+            <div class="doc-step-num">🌶️</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">CoinPaprika — Optional key</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Works without a key on the free tier (20,000 calls/month, top 2,000 coins). Paid plans available at <a href="https://coinpaprika.com/api/" target="_blank" rel="noopener">coinpaprika.com/api</a>.
+              </p>
+              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
+                ✅ Free keyless access is sufficient for this calculator.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Overview -->
+      <section class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>ℹ️</span> About the Project
+          </h2>
+          <span class="section-badge">Overview</span>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>CCPriceConverter</strong> is a browser-based cryptocurrency exchange rate and volume calculator that queries live APIs from 4 providers:
+        </p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem;">
+          <li>🦙 <strong>DefiLlama</strong>: Works directly in browser, no API key required.</li>
+          <li>🔵 <strong>CoinMarketCap</strong>: Requires an API key and the local proxy due to CORS restrictions.</li>
+          <li>🦎 <strong>CoinGecko</strong>: Direct browser calls, optional Demo/Pro API key.</li>
+          <li>🌶️ <strong>CoinPaprika</strong>: Direct browser calls, optional Pro API key.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4: CORS & Mini-Server -->
+      <section class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🛡️</span> Why is a Local Mini-Server Needed for CoinMarketCap?
+          </h2>
+          <span class="section-badge">CORS Proxy</span>
+        </div>
+        <p style="color: var(--text-muted); line-height: 1.6;">
+          <strong>CoinMarketCap</strong> intentionally prevents client-side browsers from making direct API calls (missing <code>Access-Control-Allow-Origin</code> headers) to prevent private API keys from being leaked in public frontends. Direct <code>fetch()</code> calls from a browser will always be blocked with a CORS error.
+        </p>
+        <p style="color: var(--text-muted); line-height: 1.6; margin-top: 0.75rem;">
+          To resolve this without complex infrastructure, the repository includes a zero-dependency mini-server (available in both <strong>Node.js</strong> and <strong>Python 3</strong>) that serves the static assets and acts as a reverse CORS proxy for <code>/api/cmc/*</code>.
+        </p>
+      </section>
+
+      <!-- Section 5: Launch Options -->
+      <section class="card-section" id="launch-options-en">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🚀</span> Launch Options
+          </h2>
+          <span class="section-badge">Quick Start</span>
+        </div>
+
+        <h3 style="font-size: 1rem; margin-top: 0.5rem; color: #a5b4fc;">Option 1: Run via Node.js (Recommended)</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Requires Node.js 18+. No npm packages need to be installed.</p>
+        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
+npm start
+# or: node server.js</pre>
+
+        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Option 2: Run via Python 3</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Uses the standard Python library (no pip packages needed).</p>
+        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
+python3 server.py</pre>
+
+        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Option 3: Custom Port</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Specify a port via the <code>PORT</code> environment variable:</p>
+        <pre class="doc-code-block">PORT=8080 node server.js
+# or: PORT=8080 python3 server.py</pre>
+
+        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Option 4: Standalone Run (Pure Static HTML)</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">
+          Open <code>index.html</code> directly via <code>file:///</code> or any static server. DefiLlama, CoinGecko, and CoinPaprika will work via public CORS, while CoinMarketCap operation is not guaranteed in pure static hosting and requires downloading the repository to run on localhost.
+        </p>
+      </section>
+
+      <!-- Section 6: Raw Files -->
       <section class="card-section">
         <div class="section-header">
           <h2 class="section-title">
@@ -354,145 +354,7 @@ python3 server.py</pre>
          ==================================================================== -->
     <div class="lang-content" data-content-lang="ru" style="display: none;">
       
-      <!-- Section 1: О проекте -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>ℹ️</span> О проекте
-          </h2>
-          <span class="section-badge">Обзор</span>
-        </div>
-        <p style="color: var(--text-muted); margin-bottom: 1rem;">
-          <strong>CCPriceConverter</strong> — веб-калькулятор криптовалютных курсов и объёмов обмена, собирающий котировки от 4 провайдеров в реальном времени:
-        </p>
-        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem;">
-          <li>🦙 <strong>DefiLlama</strong>: Работает напрямую из браузера без ключей (включён по умолчанию).</li>
-          <li>🔵 <strong>CoinMarketCap</strong>: Требует API-ключ и локальный прокси из-за ограничений CORS.</li>
-          <li>🦎 <strong>CoinGecko</strong>: Работает напрямую, опционален Demo/Pro API-ключ.</li>
-          <li>🌶️ <strong>CoinPaprika</strong>: Работает напрямую, опционален Pro API-ключ.</li>
-        </ul>
-      </section>
-
-      <!-- Section 2: CORS & Mini-Server -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>🛡️</span> Почему нужен локальный мини-сервер для CoinMarketCap?
-          </h2>
-          <span class="section-badge">CORS Прокси</span>
-        </div>
-        <p style="color: var(--text-muted); line-height: 1.6;">
-          Платформа <strong>CoinMarketCap</strong> сознательно блокирует прямые браузерные запросы (отсутствуют CORS-заголовки <code>Access-Control-Allow-Origin</code>), защищая приватные ключи пользователей от утечки на клиенте. Прямой вызов <code>fetch()</code> из браузера на <code>pro-api.coinmarketcap.com</code> блокируется браузером с ошибкой CORS.
-        </p>
-        <p style="color: var(--text-muted); line-height: 1.6; margin-top: 0.75rem;">
-          Для решения этой проблемы в проект включен сверхлегкий локальный сервер (доступны версии как на <strong>Node.js</strong>, так и на <strong>Python 3</strong> без внешних зависимостей). Сервер раздаёт статику и прозрачно проксирует запросы к <code>/api/cmc/*</code>.
-        </p>
-        <div style="margin-top: 0.9rem; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.9rem; line-height: 1.5;">
-          ⚠️ <strong>Важное примечание:</strong> Работа CoinMarketCap напрямую через сайт (GitHub Pages / статический хостинг) <strong>не гарантируется</strong> из-за строгой политики CORS браузеров. Для гарантированной работы с CoinMarketCap необходимо загрузить/склонировать содержимое репозитория и запустить его локально на <code>localhost</code> (варианты 1, 2 или 3).
-        </div>
-      </section>
-
-      <!-- Section 3: Варианты запуска -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>🚀</span> Варианты запуска
-          </h2>
-          <span class="section-badge">Быстрый старт</span>
-        </div>
-
-        <h3 style="font-size: 1rem; margin-top: 0.5rem; color: #a5b4fc;">Вариант 1: Запуск через Node.js (Рекомендуемый)</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Требуется Node.js 18+. Внешние пакеты устанавливать не требуется.</p>
-        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
-npm start
-# либо: node server.js</pre>
-
-        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Вариант 2: Запуск через Python 3</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Используется стандартная библиотека Python 3 (без pip install).</p>
-        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
-python3 server.py</pre>
-
-        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Вариант 3: Запуск на произвольном порту</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Укажите переменную окружения <code>PORT</code>:</p>
-        <pre class="doc-code-block">PORT=8080 node server.js
-# или: PORT=8080 python3 server.py</pre>
-
-        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Вариант 4: Автономный запуск (Pure Static HTML)</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">
-          Вы можете открыть <code>index.html</code> напрямую через <code>file:///</code> или любой статический сервер. DefiLlama, CoinGecko и CoinPaprika будут работать через публичный CORS. Работа CoinMarketCap на статическом сайте не гарантируется — для него требуется загрузить репозиторий на localhost.
-        </p>
-      </section>
-
-      <!-- Section: Получение API-ключей -->
-      <section class="card-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span>🔑</span> Получение API-ключей
-          </h2>
-          <span class="section-badge">Регистрация</span>
-        </div>
-
-        <div class="doc-step-list">
-          <div class="doc-step-item">
-            <div class="doc-step-num">🦙</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">DefiLlama — ключ не требуется</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                DefiLlama предоставляет полностью бесплатный и открытый API. Регистрация и API-ключ не нужны.
-              </p>
-            </div>
-          </div>
-
-          <div class="doc-step-item">
-            <div class="doc-step-num">🔵</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">CoinMarketCap — обязательный ключ (бесплатный план)</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                1. Перейдите на <a href="https://pro.coinmarketcap.com/signup" target="_blank" rel="noopener" style="color: #a5b4fc;">pro.coinmarketcap.com/signup</a> и создайте бесплатный аккаунт.<br>
-                2. Выберите план <strong>Basic</strong> (бесплатный).<br>
-                3. Подтвердите email и войдите в личный кабинет разработчика.<br>
-                4. Скопируйте API-ключ со страницы Dashboard.
-              </p>
-              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
-                ✅ Бесплатный план: 10 000 запросов/мес, 30 запросов/мин — более чем достаточно для калькулятора.
-              </p>
-            </div>
-          </div>
-
-          <div class="doc-step-item">
-            <div class="doc-step-num">🦎</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">CoinGecko — опциональный ключ (рекомендуется)</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                Работает без ключа, но с жёсткими лимитами (~10–30 запросов/мин). Рекомендуется бесплатный Demo-ключ:
-              </p>
-              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem;">
-                1. Перейдите на <a href="https://www.coingecko.com/en/api/pricing" target="_blank" rel="noopener" style="color: #a5b4fc;">coingecko.com/en/api/pricing</a> → нажмите <strong>«Start for Free»</strong>.<br>
-                2. Зарегистрируйтесь или войдите (банковская карта не требуется).<br>
-                3. В <a href="https://www.coingecko.com/en/api/dashboard" target="_blank" rel="noopener" style="color: #a5b4fc;">Developer Dashboard</a> нажмите <strong>«+ Add New Key»</strong>.
-              </p>
-              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
-                ✅ Бесплатный план (Demo): ~10 000 запросов/мес.
-              </p>
-            </div>
-          </div>
-
-          <div class="doc-step-item">
-            <div class="doc-step-num">🌶️</div>
-            <div class="doc-step-content">
-              <div class="doc-step-title">CoinPaprika — опциональный ключ</div>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">
-                Работает без ключа в рамках бесплатного тарифа (20 000 запросов/мес, топ-2000 монет). Платные планы: <a href="https://coinpaprika.com/api/" target="_blank" rel="noopener" style="color: #a5b4fc;">coinpaprika.com/api</a>.
-              </p>
-              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
-                ✅ Для калькулятора достаточно бесплатного доступа без ключа.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 4: Использование интерфейса -->
+      <!-- Section 1: Использование интерфейса -->
       <section class="card-section">
         <div class="section-header">
           <h2 class="section-title">
@@ -567,7 +429,145 @@ python3 server.py</pre>
         </div>
       </section>
 
-      <!-- Section 5: Исходные Markdown файлы -->
+      <!-- Section 2: Получение API-ключей -->
+      <section class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🔑</span> Получение API-ключей
+          </h2>
+          <span class="section-badge">Регистрация</span>
+        </div>
+
+        <div class="doc-step-list">
+          <div class="doc-step-item">
+            <div class="doc-step-num">🦙</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">DefiLlama — ключ не требуется</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                DefiLlama предоставляет полностью бесплатный и открытый API. Регистрация и API-ключ не нужны.
+              </p>
+            </div>
+          </div>
+
+          <div class="doc-step-item">
+            <div class="doc-step-num">🔵</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">CoinMarketCap — обязательный ключ (бесплатный план)</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                1. Перейдите на <a href="https://pro.coinmarketcap.com/signup" target="_blank" rel="noopener">pro.coinmarketcap.com/signup</a> и создайте бесплатный аккаунт.<br>
+                2. Выберите план <strong>Basic</strong> (бесплатный).<br>
+                3. Подтвердите email и войдите в личный кабинет разработчика.<br>
+                4. Скопируйте API-ключ со страницы Dashboard.
+              </p>
+              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
+                ✅ Бесплатный план: 10 000 запросов/мес, 30 запросов/мин — более чем достаточно для калькулятора.
+              </p>
+              <div class="doc-alert-warning">
+                ⚠️ <strong>Важное примечание:</strong> Работа CoinMarketCap напрямую через сайт (GitHub Pages / статический хостинг) <strong>не гарантируется</strong> из-за строгой политики CORS браузеров. Для гарантированной работы с CoinMarketCap необходимо загрузить/склонировать содержимое репозитория и запустить его локально на <code>localhost</code> (<a href="#launch-options-ru">варианты 1, 2 или 3</a>).
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-step-item">
+            <div class="doc-step-num">🦎</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">CoinGecko — опциональный ключ (рекомендуется)</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Работает без ключа, но с жёсткими лимитами (~10–30 запросов/мин). Рекомендуется бесплатный Demo-ключ:
+              </p>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem;">
+                1. Перейдите на <a href="https://www.coingecko.com/en/api/pricing" target="_blank" rel="noopener">coingecko.com/en/api/pricing</a> → нажмите <strong>«Start for Free»</strong>.<br>
+                2. Зарегистрируйтесь или войдите (банковская карта не требуется).<br>
+                3. В <a href="https://www.coingecko.com/en/api/dashboard" target="_blank" rel="noopener">Developer Dashboard</a> нажмите <strong>«+ Add New Key»</strong>.
+              </p>
+              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
+                ✅ Бесплатный план (Demo): ~10 000 запросов/мес.
+              </p>
+            </div>
+          </div>
+
+          <div class="doc-step-item">
+            <div class="doc-step-num">🌶️</div>
+            <div class="doc-step-content">
+              <div class="doc-step-title">CoinPaprika — опциональный ключ</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Работает без ключа в рамках бесплатного тарифа (20 000 запросов/мес, топ-2000 монет). Платные планы: <a href="https://coinpaprika.com/api/" target="_blank" rel="noopener">coinpaprika.com/api</a>.
+              </p>
+              <p style="color: var(--color-success); font-size: 0.85rem; margin-top: 0.4rem;">
+                ✅ Для калькулятора достаточно бесплатного доступа без ключа.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: О проекте -->
+      <section class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>ℹ️</span> О проекте
+          </h2>
+          <span class="section-badge">Обзор</span>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>CCPriceConverter</strong> — веб-калькулятор криптовалютных курсов и объёмов обмена, собирающий котировки от 4 провайдеров в реальном времени:
+        </p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem;">
+          <li>🦙 <strong>DefiLlama</strong>: Работает напрямую из браузера без ключей (включён по умолчанию).</li>
+          <li>🔵 <strong>CoinMarketCap</strong>: Требует API-ключ и локальный прокси из-за ограничений CORS.</li>
+          <li>🦎 <strong>CoinGecko</strong>: Работает напрямую, опционален Demo/Pro API-ключ.</li>
+          <li>🌶️ <strong>CoinPaprika</strong>: Работает напрямую, опционален Pro API-ключ.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4: CORS & Mini-Server -->
+      <section class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🛡️</span> Почему нужен локальный мини-сервер для CoinMarketCap?
+          </h2>
+          <span class="section-badge">CORS Прокси</span>
+        </div>
+        <p style="color: var(--text-muted); line-height: 1.6;">
+          Платформа <strong>CoinMarketCap</strong> сознательно блокирует прямые браузерные запросы (отсутствуют CORS-заголовки <code>Access-Control-Allow-Origin</code>), защищая приватные ключи пользователей от утечки на клиенте. Прямой вызов <code>fetch()</code> из браузера на <code>pro-api.coinmarketcap.com</code> блокируется браузером с ошибкой CORS.
+        </p>
+        <p style="color: var(--text-muted); line-height: 1.6; margin-top: 0.75rem;">
+          Для решения этой проблемы в проект включен сверхлегкий локальный сервер (доступны версии как на <strong>Node.js</strong>, так и на <strong>Python 3</strong> без внешних зависимостей). Сервер раздаёт статику и прозрачно проксирует запросы к <code>/api/cmc/*</code>.
+        </p>
+      </section>
+
+      <!-- Section 5: Варианты запуска -->
+      <section class="card-section" id="launch-options-ru">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>🚀</span> Варианты запуска
+          </h2>
+          <span class="section-badge">Быстрый старт</span>
+        </div>
+
+        <h3 style="font-size: 1rem; margin-top: 0.5rem; color: #a5b4fc;">Вариант 1: Запуск через Node.js (Рекомендуемый)</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Требуется Node.js 18+. Внешние пакеты устанавливать не требуется.</p>
+        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
+npm start
+# либо: node server.js</pre>
+
+        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Вариант 2: Запуск через Python 3</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Используется стандартная библиотека Python 3 (без pip install).</p>
+        <pre class="doc-code-block">cd /home/mega/git/CCPriceConverter
+python3 server.py</pre>
+
+        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Вариант 3: Запуск на произвольном порту</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">Укажите переменную окружения <code>PORT</code>:</p>
+        <pre class="doc-code-block">PORT=8080 node server.js
+# или: PORT=8080 python3 server.py</pre>
+
+        <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Вариант 4: Автономный запуск (Pure Static HTML)</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">
+          Вы можете открыть <code>index.html</code> напрямую через <code>file:///</code> или любой статический сервер. DefiLlama, CoinGecko и CoinPaprika будут работать через публичный CORS. Работа CoinMarketCap на статическом сайте не гарантируется — для него требуется загрузить репозиторий на localhost.
+        </p>
+      </section>
+
+      <!-- Section 6: Исходные Markdown файлы -->
       <section class="card-section">
         <div class="section-header">
           <h2 class="section-title">
