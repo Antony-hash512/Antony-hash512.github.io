@@ -276,6 +276,10 @@ body {
   user-select: none;
 }
 
+.ctrl-btn.icon-only-btn {
+  padding: 0.35rem 0.5rem;
+}
+
 .ctrl-btn:hover {
   color: var(--text-main);
   background: rgba(255, 255, 255, 0.05);

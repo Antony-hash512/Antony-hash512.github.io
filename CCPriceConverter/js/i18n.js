@@ -12,8 +12,8 @@ export const TRANSLATIONS = {
     appSubtitle: "Compare live quotes and evaluate exchange efficiency via APIs from leading providers",
     
     // Top bar navigation & themes
-    navHome: "Home",
-    navInstructions: "Instructions",
+    navHome: "",
+    navInstructions: "Instruction",
     themeLight: "Light",
     themeDark: "Dark",
     themeSystem: "System",
@@ -118,8 +118,8 @@ export const TRANSLATIONS = {
     appSubtitle: "Сравнение котировок и оценка эффективности обмена по API от ведущих провайдеров",
     
     // Top bar navigation & themes
-    navHome: "Главная",
-    navInstructions: "Инструкция",
+    navHome: "",
+    navInstructions: "Инструкциия",
     themeLight: "Светлая",
     themeDark: "Тёмная",
     themeSystem: "Системная",
