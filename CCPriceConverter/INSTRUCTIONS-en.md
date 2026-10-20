@@ -110,7 +110,7 @@ The free keyless access is sufficient for this calculator.
 ## Using the Interface
 
 1. **Selecting Providers**:
-   - **DefiLlama** is selected by default.
+   - **DefiLlama**, **CoinGecko**, and **CoinPaprika** are selected by default (in "Without key" mode).
    - You can select anywhere from 1 to 4 providers.
    - If only one checkbox is active, it becomes locked from being unchecked (at least one source must always remain selected).
    - For **CoinGecko** and **CoinPaprika**, independent **"Without key"** checkboxes are provided (checked by default). When checked, requests query public free endpoints without authentication. When unchecked, the Demo/Pro API key input field is enabled to send authenticated requests.

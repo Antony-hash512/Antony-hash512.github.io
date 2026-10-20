@@ -161,7 +161,7 @@
             <div class="doc-step-content">
               <div class="doc-step-title">Select Providers</div>
               <p style="color: var(--text-muted); font-size: 0.9rem;">
-                DefiLlama is selected by default. You can enable 1 to 4 providers. If only one provider is selected, it cannot be unchecked. For CoinGecko and CoinPaprika, independent <strong>"Without key"</strong> checkboxes are provided (enabled by default) for free unauthenticated access. Unchecking them allows entering Demo/Pro API keys. API key inputs show a floppy disk (<code>💾</code>) when keys are saved in <code>localStorage</code>, or a crossed disk when saving is prevented.
+                DefiLlama, CoinGecko, and CoinPaprika are selected by default (in "Without key" mode). You can enable 1 to 4 providers. If only one provider is selected, it cannot be unchecked. For CoinGecko and CoinPaprika, independent <strong>"Without key"</strong> checkboxes are provided (enabled by default) for free unauthenticated access. Unchecking them allows entering Demo/Pro API keys. API key inputs show a floppy disk (<code>💾</code>) when keys are saved in <code>localStorage</code>, or a crossed disk when saving is prevented.
               </p>
             </div>
           </div>
@@ -305,10 +305,10 @@
           <strong>CCPriceConverter</strong> is a browser-based cryptocurrency exchange rate and volume calculator that queries live APIs from 4 providers:
         </p>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem;">
-          <li>🦙 <strong>DefiLlama</strong>: Works directly in browser, no API key required.</li>
+          <li>🦙 <strong>DefiLlama</strong>: Works directly in browser, no API key required (enabled by default).</li>
           <li>🔵 <strong>CoinMarketCap</strong>: Requires an API key and the local proxy due to CORS restrictions.</li>
-          <li>🦎 <strong>CoinGecko</strong>: Direct browser calls, optional Demo/Pro API key.</li>
-          <li>🌶️ <strong>CoinPaprika</strong>: Direct browser calls, optional Pro API key.</li>
+          <li>🦎 <strong>CoinGecko</strong>: Direct browser calls (enabled by default keyless), optional Demo/Pro API key.</li>
+          <li>🌶️ <strong>CoinPaprika</strong>: Direct browser calls (enabled by default keyless), optional Pro API key.</li>
         </ul>
       </section>
 
@@ -441,7 +441,7 @@ python3 server.py</pre>
             <div class="doc-step-content">
               <div class="doc-step-title">Выбор провайдеров</div>
               <p style="color: var(--text-muted); font-size: 0.9rem;">
-                По умолчанию активна только DefiLlama. Можно выбрать от 1 до 4 чекбоксов. Если активен только 1 чекбокс, он блокируется от снятия. Для CoinGecko и CoinPaprika доступны независимые чекбоксы <strong>«Без ключа»</strong> (по умолчанию включены) для работы по бесплатному публичному API. При их снятии активируются поля ввода Demo/Pro ключей. Слева от полей ввода ключей отображается индикатор: дискета (<code>💾</code>), если ключ сохранён в <code>localStorage</code>, либо перечёркнутая дискета при запрете сохранения.
+                По умолчанию активны 3 провайдера: DefiLlama, CoinGecko и CoinPaprika (в режиме «Без ключа»). Можно выбрать от 1 до 4 чекбоксов. Если активен только 1 чекбокс, он блокируется от снятия. Для CoinGecko и CoinPaprika доступны независимые чекбоксы <strong>«Без ключа»</strong> (по умолчанию включены) для работы по бесплатному публичному API. При их снятии активируются поля ввода Demo/Pro ключей. Слева от полей ввода ключей отображается индикатор: дискета (<code>💾</code>), если ключ сохранён в <code>localStorage</code>, либо перечёркнутая дискета при запрете сохранения.
               </p>
             </div>
           </div>
@@ -587,8 +587,8 @@ python3 server.py</pre>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem;">
           <li>🦙 <strong>DefiLlama</strong>: Работает напрямую из браузера без ключей (включён по умолчанию).</li>
           <li>🔵 <strong>CoinMarketCap</strong>: Требует API-ключ и локальный прокси из-за ограничений CORS.</li>
-          <li>🦎 <strong>CoinGecko</strong>: Работает напрямую, опционален Demo/Pro API-ключ.</li>
-          <li>🌶️ <strong>CoinPaprika</strong>: Работает напрямую, опционален Pro API-ключ.</li>
+          <li>🦎 <strong>CoinGecko</strong>: Работает напрямую (включён по умолчанию без ключа), опционален Demo/Pro API-ключ.</li>
+          <li>🌶️ <strong>CoinPaprika</strong>: Работает напрямую (включён по умолчанию без ключа), опционален Pro API-ключ.</li>
         </ul>
       </section>
 

@@ -37,7 +37,7 @@ export const PROVIDERS_CONFIG = [
     iconClass: 'icon-gecko',
     iconText: '🦎',
     requiresKey: true,
-    defaultChecked: false,
+    defaultChecked: true,
     keyPlaceholder: 'Demo/Pro API ключ (опционально для бесплатного тарифа)',
     description: 'Крупнейший независимый каталог криптоактивов'
   },
@@ -47,7 +47,7 @@ export const PROVIDERS_CONFIG = [
     iconClass: 'icon-paprika',
     iconText: '🌶️',
     requiresKey: true,
-    defaultChecked: false,
+    defaultChecked: true,
     keyPlaceholder: 'Pro API ключ (опционально для бесплатного тарифа)',
     description: 'Аналитическая платформа котировок с открытым API'
   }
