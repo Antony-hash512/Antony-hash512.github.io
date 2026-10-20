@@ -236,7 +236,9 @@ const TRANSLATIONS = {
     appTitle: "Crypto Rate Calculator",
     appSubtitle: "Compare live quotes and evaluate exchange efficiency via APIs from leading providers",
     
-    // Top bar themes
+    // Top bar navigation & themes
+    navHome: "Home",
+    navInstructions: "Instructions",
     themeLight: "Light",
     themeDark: "Dark",
     themeSystem: "System",
@@ -340,7 +342,9 @@ const TRANSLATIONS = {
     appTitle: "Калькулятор курсов криптовалют",
     appSubtitle: "Сравнение котировок и оценка эффективности обмена по API от ведущих провайдеров",
     
-    // Top bar themes
+    // Top bar navigation & themes
+    navHome: "Главная",
+    navInstructions: "Инструкция",
     themeLight: "Светлая",
     themeDark: "Тёмная",
     themeSystem: "Системная",

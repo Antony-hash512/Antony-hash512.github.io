@@ -18,15 +18,27 @@
     
     <!-- Top Controls Bar -->
     <aside class="top-controls-bar" id="top-controls-bar" aria-label="Page navigation and preferences">
-      <!-- Back to Calculator -->
-      <a href="index.html" class="ctrl-btn" style="text-decoration: none;">
-        <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        <span class="lang-content" data-content-lang="en">Calculator</span>
-        <span class="lang-content" data-content-lang="ru" style="display: none;">Калькулятор</span>
-      </a>
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <!-- Back to Main Portfolio -->
+        <a href="../index.html" class="ctrl-btn" style="text-decoration: none;" title="Return to main portfolio">
+          <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span class="lang-content" data-content-lang="en">Home</span>
+          <span class="lang-content" data-content-lang="ru" style="display: none;">Главная</span>
+        </a>
+
+        <!-- Back to Calculator -->
+        <a href="index.html" class="ctrl-btn" style="text-decoration: none;" title="Return to calculator">
+          <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span class="lang-content" data-content-lang="en">Calculator</span>
+          <span class="lang-content" data-content-lang="ru" style="display: none;">Калькулятор</span>
+        </a>
+      </div>
 
       <!-- Right Controls: Language & Theme -->
       <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
@@ -133,6 +145,9 @@
         <p style="color: var(--text-muted); line-height: 1.6; margin-top: 0.75rem;">
           To resolve this without complex infrastructure, the repository includes a zero-dependency mini-server (available in both <strong>Node.js</strong> and <strong>Python 3</strong>) that serves the static assets and acts as a reverse CORS proxy for <code>/api/cmc/*</code>.
         </p>
+        <div style="margin-top: 0.9rem; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.9rem; line-height: 1.5;">
+          ⚠️ <strong>Important Note:</strong> CoinMarketCap operation through a deployed public website (GitHub Pages / static web hosting) is <strong>not guaranteed</strong> due to strict browser CORS policies. To work with CoinMarketCap reliably, you need to download/clone the repository contents and run it locally on <code>localhost</code> using Option 1, 2, or 3.
+        </div>
       </section>
 
       <!-- Section 3: Launch Options -->
@@ -162,7 +177,7 @@ python3 server.py</pre>
 
         <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Option 4: Standalone Run (Pure Static HTML)</h3>
         <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">
-          Open <code>index.html</code> directly via <code>file:///</code> or any static server. DefiLlama, CoinGecko, and CoinPaprika will work via public CORS, while CoinMarketCap will display an informative hint to start the local proxy.
+          Open <code>index.html</code> directly via <code>file:///</code> or any static server. DefiLlama, CoinGecko, and CoinPaprika will work via public CORS, while CoinMarketCap operation is not guaranteed in pure static hosting and requires downloading the repository to run on localhost.
         </p>
       </section>
 
@@ -374,6 +389,9 @@ python3 server.py</pre>
         <p style="color: var(--text-muted); line-height: 1.6; margin-top: 0.75rem;">
           Для решения этой проблемы в проект включен сверхлегкий локальный сервер (доступны версии как на <strong>Node.js</strong>, так и на <strong>Python 3</strong> без внешних зависимостей). Сервер раздаёт статику и прозрачно проксирует запросы к <code>/api/cmc/*</code>.
         </p>
+        <div style="margin-top: 0.9rem; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.9rem; line-height: 1.5;">
+          ⚠️ <strong>Важное примечание:</strong> Работа CoinMarketCap напрямую через сайт (GitHub Pages / статический хостинг) <strong>не гарантируется</strong> из-за строгой политики CORS браузеров. Для гарантированной работы с CoinMarketCap необходимо загрузить/склонировать содержимое репозитория и запустить его локально на <code>localhost</code> (варианты 1, 2 или 3).
+        </div>
       </section>
 
       <!-- Section 3: Варианты запуска -->
@@ -403,7 +421,7 @@ python3 server.py</pre>
 
         <h3 style="font-size: 1rem; margin-top: 1rem; color: #a5b4fc;">Вариант 4: Автономный запуск (Pure Static HTML)</h3>
         <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.3rem 0;">
-          Вы можете открыть <code>index.html</code> напрямую через <code>file:///</code> или любой статический сервер. DefiLlama, CoinGecko и CoinPaprika будут работать через публичный CORS.
+          Вы можете открыть <code>index.html</code> напрямую через <code>file:///</code> или любой статический сервер. DefiLlama, CoinGecko и CoinPaprika будут работать через публичный CORS. Работа CoinMarketCap на статическом сайте не гарантируется — для него требуется загрузить репозиторий на localhost.
         </p>
       </section>
 

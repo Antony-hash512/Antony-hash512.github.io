@@ -69,9 +69,9 @@ PORT=8080 python3 server.py
 
 ### Option 4: Standalone Run (Pure Static HTML)
 
-You can also open `index.html` directly in your browser (via `file:///` or any static server such as Live Server in VS Code / Antigravity IDE).
+You can also open `index.html` directly in your browser (via `file:///` or any static server such as Live Server in VS Code / Antigravity IDE / GitHub Pages).
 - Providers **DefiLlama**, **CoinGecko**, and **CoinPaprika** will work directly via public CORS.
-- For **CoinMarketCap** in this mode, a running local proxy or an accessible external CORS proxy is required (the interface displays an informative hint if the proxy is unavailable).
+- **Notice:** CoinMarketCap operation directly through a static website is **not guaranteed** due to strict browser CORS policies. To work with CoinMarketCap reliably, you need to download/clone the repository contents and run it locally on `localhost` (via Node.js or Python 3).
 
 ---
 
