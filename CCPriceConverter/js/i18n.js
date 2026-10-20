@@ -10,7 +10,7 @@ export const TRANSLATIONS = {
     brandBadge: "Multi-Provider Exchange Rates",
     appTitle: "Crypto Rate Calculator",
     appSubtitle: "Compare live quotes and evaluate exchange efficiency via APIs from leading providers",
-    
+
     // Top bar navigation & themes
     navHome: "",
     navInstructions: "Instruction",
@@ -66,7 +66,7 @@ export const TRANSLATIONS = {
     metricSellVolumeUsd: "Sell volume in USD",
     metricTotalBuy: "Total Received ({amount} {sym})",
     metricBuyVolumeUsd: "Buy volume in USD",
-    
+
     diffHeader: "Difference Calculation",
     diffStatusLossHigh: "Loss (> $20)",
     diffStatusLossLow: "Loss (≤ $20)",
@@ -94,7 +94,7 @@ export const TRANSLATIONS = {
     cmcExpandTooltip: "Expand hint",
 
     // API Key Storage & Security Controls
-    dontSaveKeys: "Do not save keys",
+    dontSaveKeys: "Do not save API-keys",
     dontSaveKeysTooltip: "Prevent saving API keys to browser localStorage",
     clearSavedKeys: "Clear keys",
     clearKeysTooltip: "Delete saved API keys from browser localStorage",
@@ -116,7 +116,7 @@ export const TRANSLATIONS = {
     brandBadge: "Мультипровайдерный обменный курс",
     appTitle: "Калькулятор курсов криптовалют",
     appSubtitle: "Сравнение котировок и оценка эффективности обмена по API от ведущих провайдеров",
-    
+
     // Top bar navigation & themes
     navHome: "",
     navInstructions: "Инструкциия",
@@ -172,7 +172,7 @@ export const TRANSLATIONS = {
     metricSellVolumeUsd: "Объем продажи в USD",
     metricTotalBuy: "Всего получаем ({amount} {sym})",
     metricBuyVolumeUsd: "Объем покупки в USD",
-    
+
     diffHeader: "Расчёт разницы",
     diffStatusLossHigh: "Потери (> $20)",
     diffStatusLossLow: "Потери (до $20)",
@@ -200,7 +200,7 @@ export const TRANSLATIONS = {
     cmcExpandTooltip: "Развернуть подсказку",
 
     // API Key Storage & Security Controls
-    dontSaveKeys: "Не сохранять ключи",
+    dontSaveKeys: "Не сохранять API-ключи",
     dontSaveKeysTooltip: "Превентивно не сохранять API-ключи в localStorage браузера",
     clearSavedKeys: "Стереть ключи",
     clearKeysTooltip: "Удалить сохранённые API-ключи из localStorage браузера",
@@ -226,7 +226,7 @@ function resolveInitialLanguage() {
         localStorage.setItem(STORAGE_LANG_KEY, urlLang);
         return urlLang;
       }
-    } catch {}
+    } catch { }
   }
   const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_LANG_KEY) : null;
   if (saved === 'ru' || saved === 'en') {
@@ -241,7 +241,7 @@ function syncUrlLang(lang) {
       const url = new URL(window.location.href);
       url.searchParams.set('lang', lang);
       window.history.replaceState(null, '', url.toString());
-    } catch {}
+    } catch { }
   }
 }
 
