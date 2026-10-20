@@ -106,6 +106,10 @@
   --color-success-border: rgba(5, 150, 105, 0.35);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -379,6 +383,7 @@ body {
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
+  scroll-margin-top: 1.5rem;
 }
 
 .card-section::before {
@@ -1697,6 +1702,84 @@ body {
   background: #fee2e2;
   border: 1px solid #fca5a5;
   color: #7f1d1d;
+}
+
+/* Table of Contents (TOC) Component */
+.doc-toc {
+  padding: 1.1rem 1.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.doc-toc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.doc-toc-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.doc-toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.55rem;
+}
+
+.doc-toc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(13, 18, 31, 0.45);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-size: 0.86rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.doc-toc-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.doc-toc-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-toc-item:hover {
+  border-color: var(--primary-accent);
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .doc-toc-item {
+  background: rgba(248, 250, 252, 0.9);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: var(--text-main);
+}
+
+[data-theme="light"] .doc-toc-item:hover {
+  border-color: #6366f1;
+  color: #4f46e5;
+  background: rgba(99, 102, 241, 0.08);
 }
 
 /* ==========================================================================
