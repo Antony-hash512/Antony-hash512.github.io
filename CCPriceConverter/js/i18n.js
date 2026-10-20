@@ -119,7 +119,7 @@ export const TRANSLATIONS = {
 
     // Top bar navigation & themes
     navHome: "",
-    navInstructions: "Инструкциия",
+    navInstructions: "Инструкция",
     themeLight: "Светлая",
     themeDark: "Тёмная",
     themeSystem: "Системная",
